@@ -14,7 +14,6 @@
         public $enablePagination = true;
         public $itemsCssClass = '';
         public $pageSize = 10;
-		
 		/*
 		 * @var CActiveDataProvider
 		 */
@@ -62,8 +61,18 @@
         protected function getHeader(CGridColumn $column)
         {
             ob_start();
-            $column->renderHeaderCell();
-            return strip_tags(ob_get_clean());
+			if ($column instanceof CDataColumn) 
+			{
+				$sortable = $column->sortable;
+				$column->sortable = false;
+			}
+			$column->renderHeaderCell();
+			if ($column instanceof CDataColumn)
+			{
+				$column->sortable = $sortable ;
+			}
+
+            return $this->removeOuterTag(ob_get_clean());
         }
         public function init()
 		{
@@ -71,8 +80,16 @@
 				$this->htmlOptions['class']='datatable-view';
 
             parent::init();
-
-
+			if ($this->selectableRows == 1)
+			{
+				$this->itemsCssClass .= ' singleSelect';
+				$this->config['fnInitComplete'] = new CJavaScriptExpression("function() { $(this).find('tr input:checked').each(function() { $(this).closest('tr').addClass('selected'); }); }");
+			}
+			elseif ($this->selectableRows > 1)
+			{
+				$this->itemsCssClass .= ' multiSelect';
+				$this->config['fnInitComplete'] = new CJavaScriptExpression("function() { $(this).find('tr input:checked').each(function() { $(this).closest('tr').addClass('selected'); }); }");
+			}
             $this->config["bPaginate"] = $this->enablePagination;// && $this->dataProvider->getTotalItemCount() > $this->pageSize;
 			$this->config["iDisplayLength"] = $this->pageSize;
             $this->config["oLanguage"]["sInfo"] = Yii::t('app', "Showing entries {start} to {end} out of {total}", array(
@@ -120,7 +137,7 @@
 
         public function registerClientScript()
 		{
-            $url = App()->getAssetManager()->publish(dirname(__FILE__) . '/assets');
+			$url = App()->getAssetManager()->publish(dirname(__FILE__) . '/assets', false, -1, YII_DEBUG);
             App()->getClientScript()->registerPackage('jQuery');
             if (defined(YII_DEBUG))
             {
@@ -134,8 +151,6 @@
             App()->getClientScript()->registerCssFile($url . '/css/jquery.dataTables.css');
 			App()->getClientScript()->registerCssFile($url . '/css/overrides.css');
 			App()->getClientScript()->registerScriptFile($url . '/js/widget.js');
-           
-            
         }
 
 
@@ -145,20 +160,24 @@
         protected function renderData()
         {
             $this->config['aaData'] = $this->createDataArray();
-            App()->getClientScript()->registerScript($this->getId(), "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " > table').dataTable(" . json_encode($this->config) . "));", CClientScript::POS_READY);
+            App()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " > table').dataTable(" . CJavaScript::encode($this->config) . "));", CClientScript::POS_READY);
         }
 
         /**
-         * This function renders the item, either has HTML table or as javascript array.
+         * This function renders the item, either as HTML table or as javascript array.
          */
         public function renderItems()
         {
             echo "<table class=\"{$this->itemsCssClass}\">\n";
-			echo "</table>";
             if (!$this->gracefulDegradation)
             {
                 $this->renderData();
             }
+			else
+			{
+				throw new Exception('Graceful degration not yet supported.');
+			}
+			echo "</table>";
 
         }
 
