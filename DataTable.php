@@ -137,20 +137,20 @@
 
         public function registerClientScript()
 		{
-			$url = App()->getAssetManager()->publish(dirname(__FILE__) . '/assets', false, -1, YII_DEBUG);
-            App()->getClientScript()->registerPackage('jQuery');
+			$url = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/assets', false, -1, YII_DEBUG);
+            Yii::app()->getClientScript()->registerPackage('jQuery');
             if (defined(YII_DEBUG))
             {
-                App()->getClientScript()->registerScriptFile($url . '/js/jquery.dataTables.js');
+                Yii::app()->getClientScript()->registerScriptFile($url . '/js/jquery.dataTables.js');
             }
             else
             {
-                App()->getClientScript()->registerScriptFile($url . '/js/jquery.dataTables.min.js');
+                Yii::app()->getClientScript()->registerScriptFile($url . '/js/jquery.dataTables.min.js');
             }
-			App()->getClientScript()->registerScriptFile($url . '/js/datatables.reload.js');
-            App()->getClientScript()->registerCssFile($url . '/css/jquery.dataTables.css');
-			App()->getClientScript()->registerCssFile($url . '/css/overrides.css');
-			App()->getClientScript()->registerScriptFile($url . '/js/widget.js');
+			Yii::app()->getClientScript()->registerScriptFile($url . '/js/datatables.reload.js');
+            Yii::app()->getClientScript()->registerCssFile($url . '/css/jquery.dataTables.css');
+			Yii::app()->getClientScript()->registerCssFile($url . '/css/overrides.css');
+			Yii::app()->getClientScript()->registerScriptFile($url . '/js/widget.js');
         }
 
 
@@ -160,7 +160,7 @@
         protected function renderData()
         {
             $this->config['aaData'] = $this->createDataArray();
-            App()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " > table').dataTable(" . CJavaScript::encode($this->config) . "));", CClientScript::POS_READY);
+            Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " > table').dataTable(" . CJavaScript::encode($this->config) . "));", CClientScript::POS_READY);
         }
 
         /**
