@@ -6,13 +6,14 @@
     class DataTable extends CGridView
     {
 
+		public $selectableRows = 0;
         /**
          *
          * @var CGridColumn[]
          */
         public $columns = array();
         public $enablePagination = true;
-        public $itemsCssClass = '';
+        public $itemsCssClass = 'table';
         public $pageSize = 10;
 		/*
 		 * @var CActiveDataProvider
