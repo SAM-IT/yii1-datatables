@@ -8,3 +8,7 @@ table.dataTable tbody tr.selected {
 table.dataTable tbody tr.selected td.sorting_1 {
 	background-color: #B0BED9;
 }
+
+table.dataTable thead th.sorting_disabled {
+	cursor: default;
+}

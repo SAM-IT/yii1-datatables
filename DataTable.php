@@ -132,6 +132,11 @@
 					}
 				}
 
+				// Set width if applicable.
+				if (isset($column->htmlOptions['width']))
+				{
+					$columnConfig['sWidth'] = $column->htmlOptions['width'];
+				}
 				$this->config["aoColumns"][] = $columnConfig;
             }
         }
