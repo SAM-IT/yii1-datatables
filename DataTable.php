@@ -60,22 +60,7 @@
 			$this->dataProvider->setPagination($paginator);
 			return $data;
 		}
-        protected function getHeader(CGridColumn $column)
-        {
-            ob_start();
-			if ($column instanceof CDataColumn) 
-			{
-				$sortable = $column->sortable;
-				$column->sortable = false;
-			}
-			$column->renderHeaderCell();
-			if ($column instanceof CDataColumn)
-			{
-				$column->sortable = $sortable ;
-			}
-
-            return $this->removeOuterTag(ob_get_clean());
-        }
+        
         public function init()
 		{
 			if(!isset($this->htmlOptions['class']))
@@ -106,7 +91,7 @@
             ));
 
 			$this->config["bSort"] = $this->enableSorting;
-			$this->config["bFilter"] = $this->filter;
+			$this->config["bFilter"] = false;
         }
 
         protected function initColumns()
@@ -115,7 +100,6 @@
             foreach ($this->columns as $column)
             {
 				$columnConfig = array(
-                    //'sTitle' => $this->getHeader($column),
                     'bSortable' => $this->enableSorting && $column instanceof CDataColumn && $column->sortable,
 				);
 				if ($column instanceof CDataColumn)
@@ -172,14 +156,33 @@
 
 		public function renderFilter()
 		{
-			parent::renderFilter();
+			if($this->filter!==null)
+			{
+				echo "<tr class=\"{$this->filterCssClass}\">\n";
+				foreach($this->columns as $column)
+				{
+					//echo $column->renderFilterCell();
+					echo "<th>";
+					if ($column instanceOf CDataColumn)
+					{
+						echo "<input/>";
+					}
+					else
+					{
+						echo $this->blankDisplay;
+					}
+					echo "</th>";
+
+				}
+				echo "</tr>\n";
+			}
 		}
         /**
          * This function renders the item, either as HTML table or as javascript array.
          */
         public function renderItems()
         {
-            echo "<table class=\"{$this->itemsCssClass}\">\n";
+            echo "<table class=\"dataTable {$this->itemsCssClass}\">\n";
 
 			$this->renderTableHeader();
 

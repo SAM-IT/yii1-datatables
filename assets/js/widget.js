@@ -59,4 +59,10 @@ $(document).ready(function() {
 		}
 	});
 
+
+
+	$('table.dataTable').on('keyup', 'tr.filters input', function(e) {
+		$(this).closest('table').dataTable().fnFilter($(this).val(), $(this).closest('tr.filters').find('input').index(this));
+	});
+
 });
