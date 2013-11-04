@@ -91,7 +91,8 @@
             ));
 
 			$this->config["bSort"] = $this->enableSorting;
-			$this->config["bFilter"] = false;
+			$this->config["bFilter"] = !is_null($this->filter);
+			$this->config["sDom"] = 'lrtip';
         }
 
         protected function initColumns()
