@@ -7,6 +7,7 @@
     {
 
 		public $selectableRows = 0;
+		public $filterPosition = self::FILTER_POS_HEADER;
         /**
          *
          * @var CGridColumn[]
@@ -114,7 +115,7 @@
             foreach ($this->columns as $column)
             {
 				$columnConfig = array(
-                    'sTitle' => $this->getHeader($column),
+                    //'sTitle' => $this->getHeader($column),
                     'bSortable' => $this->enableSorting && $column instanceof CDataColumn && $column->sortable,
 				);
 				if ($column instanceof CDataColumn)
@@ -169,13 +170,20 @@
             Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " > table').dataTable(" . CJavaScript::encode($this->config) . "));", CClientScript::POS_READY);
         }
 
+		public function renderFilter()
+		{
+			parent::renderFilter();
+		}
         /**
          * This function renders the item, either as HTML table or as javascript array.
          */
         public function renderItems()
         {
             echo "<table class=\"{$this->itemsCssClass}\">\n";
-            if (!$this->gracefulDegradation)
+
+			$this->renderTableHeader();
+
+			if (!$this->gracefulDegradation)
             {
                 $this->renderData();
             }
@@ -193,6 +201,14 @@
         public function renderSummary() {
             //parent::renderSummary();
         }
+		
+		public function renderTableHeader()
+		{
+			$sorting = $this->enableSorting;
+			$this->enableSorting = false;
+			parent::renderTableHeader();
+			$this->enableSorting = $sorting;
+		}
         public function run() {
 			if (Yii::app()->getRequest()->getIsAjaxRequest())
 			{
