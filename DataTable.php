@@ -98,7 +98,7 @@
         protected function initColumns()
 		{
             parent::initColumns();
-            foreach ($this->columns as $column)
+			foreach ($this->columns as $column)
             {
 				$columnConfig = array(
                     'bSortable' => $this->enableSorting && $column instanceof CDataColumn && $column->sortable,
@@ -122,6 +122,21 @@
 				if (isset($column->htmlOptions['width']))
 				{
 					$columnConfig['sWidth'] = $column->htmlOptions['width'];
+				}
+
+				// Set style if applicable.
+				if (isset($column->htmlOptions['style']))
+				{
+					// Create custom class:
+					$class = __CLASS__ . md5(microtime());
+					$css = "td.$class {{$column->htmlOptions['style']}}";
+					App()->getClientScript()->registerCss($class, $css );
+					$column->htmlOptions['class'] = isset($column->htmlOptions['class']) ? $column->htmlOptions['class'] . ' ' . $class : $class;
+				}
+				// Set class if applicable.
+				if (isset($column->htmlOptions['class']))
+				{
+					$columnConfig['sClass'] = $column->htmlOptions['class'];
 				}
 				$this->config["aoColumns"][] = $columnConfig;
             }
