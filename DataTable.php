@@ -101,7 +101,7 @@
 			foreach ($this->columns as $column)
             {
 				$columnConfig = array(
-                    'bSortable' => $this->enableSorting && $column instanceof CDataColumn && $column->sortable,
+                    'bSortable' => $this->enableSorting && isset($column->sortable) && $column->sortable,
 				);
 				if ($column instanceof CDataColumn)
 				{
@@ -179,13 +179,9 @@
 				{
 					//echo $column->renderFilterCell();
 					echo "<th>";
-					if ($column instanceOf CDataColumn)
+					if (isset($column->filter) &&  $column->filter !== false)
 					{
 						echo "<input/>";
-					}
-					else
-					{
-						echo $this->blankDisplay;
 					}
 					echo "</th>";
 
