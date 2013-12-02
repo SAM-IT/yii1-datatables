@@ -1,5 +1,5 @@
 .dataTables_wrapper {
-	overflow: hidden;
+	overflow-x: scroll;
 }
 
 table.dataTable tbody tr.selected {
