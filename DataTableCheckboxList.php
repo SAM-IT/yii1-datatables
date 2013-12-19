@@ -2,7 +2,6 @@
 	require_once(__DIR__ . '/DataTable.php');
 	class DataTableCheckboxList extends CInputWidget
 	{
-
 		public $checkBoxColumn;
 		public $options;
 		public $errorOptions;
@@ -40,7 +39,6 @@
 		public function run()
 		{
 			$this->widget('DataTable', $this->options);
-			//print_r($this->options);
 		}
 	}
 ?>

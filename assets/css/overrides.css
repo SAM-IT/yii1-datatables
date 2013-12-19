@@ -1,5 +1,5 @@
 .dataTables_wrapper {
-	overflow: hidden;
+	overflow-x: scroll;
 }
 
 table.dataTable tbody tr.selected {
@@ -13,6 +13,6 @@ table.dataTable thead th.sorting_disabled {
 	cursor: default;
 }
 
-table.dataTable input {
-	width: 100%;
+.controls .datatable-view:first-child {
+	margin-left: -180px;
 }
