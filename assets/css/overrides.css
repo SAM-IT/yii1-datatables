@@ -16,3 +16,7 @@ table.dataTable thead th.sorting_disabled {
 .controls .datatable-view:first-child {
 	margin-left: -180px;
 }
+
+.filters input {
+	width: 100%;
+}

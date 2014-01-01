@@ -177,9 +177,12 @@
 				echo "<tr class=\"{$this->filterCssClass}\">\n";
 				foreach($this->columns as $column)
 				{
-					//echo $column->renderFilterCell();
 					echo "<th>";
-					if (isset($column->filter) &&  $column->filter !== false)
+					if (isset($column->filter) && $column->filter == 'select')
+					{
+						echo "<input type='select'/>";
+					}
+					elseif (!isset($column->filter) ||  $column->filter !== false)
 					{
 						echo "<input/>";
 					}
