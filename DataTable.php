@@ -50,10 +50,9 @@
                 foreach ($this->columns as $column)
                 {
                     ob_start();
-                    $column->renderDataCell($i);
+					$column->renderDataCell($i);
+					$row[] = $this->removeOuterTag(ob_get_clean());
 					
-                    $row[] = $this->removeOuterTag(ob_get_clean());
-
                 }
                 $data[] = $row;
             }
@@ -93,6 +92,8 @@
 			$this->config["bSort"] = $this->enableSorting;
 			$this->config["bFilter"] = !is_null($this->filter);
 			$this->config["sDom"] = 'lrtip';
+
+			Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "", CClientScript::POS_READY);
         }
 
         protected function initColumns()
@@ -167,7 +168,7 @@
         protected function renderData()
         {
             $this->config['aaData'] = $this->createDataArray();
-            Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " > table').dataTable(" . CJavaScript::encode($this->config) . "));", CClientScript::POS_READY);
+			Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " > table').dataTable(" . CJavaScript::encode($this->config) . "));", CClientScript::POS_READY);
         }
 
 		public function renderFilter()
@@ -245,7 +246,7 @@
 
 		protected function removeOuterTag($str)
 		{
-			$regex = '/<.*?>(.*)<\/.*?>/';
+			$regex = '/<.*?>(.*)<\/.*?>/s';
 			$matches = array();
 			if (preg_match($regex, $str, $matches))
 			{
