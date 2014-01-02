@@ -25,6 +25,8 @@
             'bInfo' => true,
             'bLengthChange' => false,
 			'aaSorting' => array(),
+			//"fnCreatedRow" => "js:updateFilters"
+			"fnInitComplete" => "js:updateFilters"
 			//'bJQueryUI' => true
 
 
@@ -181,11 +183,11 @@
 					echo "<th>";
 					if (isset($column->filter) && $column->filter == 'select')
 					{
-						echo "<input type='select'/>";
+						echo CHtml::dropDownList('filter', null, array());
 					}
 					elseif (!isset($column->filter) ||  $column->filter !== false)
 					{
-						echo "<input/>";
+						echo CHtml::textField('filter');
 					}
 					echo "</th>";
 
