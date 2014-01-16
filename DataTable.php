@@ -26,7 +26,8 @@
             'bLengthChange' => false,
 			'aaSorting' => array(),
 			//"fnCreatedRow" => "js:updateFilters"
-			"fnInitComplete" => "js:updateFilters"
+			"fnInitComplete" => "js:updateFilters",
+			//"sAjaxSource" => null,
 			//'bJQueryUI' => true
 
 
@@ -95,6 +96,7 @@
 			$this->config["bFilter"] = !is_null($this->filter);
 			$this->config["sDom"] = 'lrtip';
 
+			$this->config["sAjaxSource"] = $this->ajaxUrl;
 			Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "", CClientScript::POS_READY);
         }
 
@@ -170,6 +172,13 @@
         protected function renderData()
         {
             $this->config['aaData'] = $this->createDataArray();
+			if (isset($this->config["sAjaxSource"]))
+			{
+				$this->config["iDeferLoading"] = $this->dataProvider->getTotalItemCount();
+				$this->config["bServerSide"] = true;
+			}
+
+
 			Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " > table').dataTable(" . CJavaScript::encode($this->config) . "));", CClientScript::POS_READY);
         }
 
@@ -200,7 +209,7 @@
          */
         public function renderItems()
         {
-            echo "<table class=\"dataTable {$this->itemsCssClass}\">\n";
+			echo "<table class=\"dataTable {$this->itemsCssClass}\">\n";
 
 			$this->renderTableHeader();
 

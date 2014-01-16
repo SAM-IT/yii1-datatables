@@ -13,7 +13,16 @@
 			parent::init();
 			$this->checkBoxColumn = array_merge(array(
 				'class' => 'CCheckBoxColumn',
-				'checked' => function($model, $row, $source) { return in_array($model->user_id, $this->model->user_id); },
+				'checked' => function($model, $row, $source) { 
+					if(is_array($this->model->{$this->attribute}))
+					{
+						return in_array($model->{$source->name}, $this->model->{$this->attribute});
+					}
+					else
+					{
+						return $model->{$source->name} == $this->model->{$this->attribute};
+					}
+				}
 			), $this->checkBoxColumn);
 			
 			
