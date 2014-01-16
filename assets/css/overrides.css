@@ -1,5 +1,6 @@
 .dataTables_wrapper {
 	overflow-x: scroll;
+	padding-bottom: 16px;
 }
 
 table.dataTable tbody tr.selected {
