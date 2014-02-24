@@ -2,9 +2,12 @@
  * Add some extra functionality for easier usage within Yii.
  */
 $(document).ready(function() {
+	// Clicking on a remove row link will remove it from the table.
 	$('body').on('click', 'table.dataTable a.removerow', function() {
 		$(this).closest('table').dataTable({"bRetrieve" : true}).fnDeleteRow($(this).closest('tr'));
 	});
+
+	// Handle row selection for single select.
 	$('body').on('click', 'table.dataTable.singleSelect tbody tr', function() {
 		if (!$(this).hasClass('selected'))
 		{
@@ -17,6 +20,8 @@ $(document).ready(function() {
 			$(this).removeClass('selected');
 		}
 	});
+
+	// Handle multiple select.
 	$('body').on('click', 'table.dataTable.multiSelect tbody tr', function() {
 		if (!$(this).hasClass('selected'))
 		{
@@ -29,10 +34,12 @@ $(document).ready(function() {
 			$(this).find('input.select-on-check').attr('checked', false);
 		}
 	});
+
 	// Don't propagate click events for inputs.'
 	$('body').on('click', 'table.dataTable.multiSelect tbody tr input', function(e) {
 		e.stopPropagation();
 	});
+
 	$('body').on('click', 'table.dataTable.multiSelect tbody tr input.select-on-check', function(e) {
 		e.stopPropagation();
 		if (this.checked)
@@ -126,15 +133,42 @@ $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique,
     return asResultData;
 }}(jQuery));
 
-function updateFilters(dataTable)
+
+// Function for updating filters.
+$.fn.dataTableExt.oApi.fnUpdateFilters = function ( oSettings)
 {
-	dataTable.oInstance.find('.filters select').each(function() {
+	oSettings.oInstance.find('.filters select').each(function() {
 		var select = $(this);
 		select.find('option').remove();
 
 		select.append('<option value="">No filter</option>');
-		$.each(dataTable.oInstance.fnGetColumnData($(this).parent().index()), function() {
+		$.each(oSettings.oInstance.fnGetColumnData($(this).parent().index()), function() {
 			select.append("<option>" + this + "</option>");
 		});
 	});
+
 }
+
+// Function for adding metadata to rows. Data is passed in the "extra column".
+$.fn.dataTableExt.oApi.fnAddMetaData = function (oSettings, nRow, aData, iDataIndex)
+{
+	console.log('adding metadata');
+	if (aData.length > $(nRow).children().length )
+	{
+		$(nRow).attr(aData[aData.length -1]);
+	}
+}
+
+jQuery.extend( jQuery.fn.dataTableExt.oSort, {
+    "alt-string-pre": function ( a ) {
+        return a.match(/alt="(.*?)"/)[1].toLowerCase();
+    },
+
+    "alt-string-asc": function( a, b ) {
+        return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    },
+
+    "alt-string-desc": function(a,b) {
+        return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+    }
+} );

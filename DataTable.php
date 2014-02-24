@@ -26,7 +26,9 @@
             'bLengthChange' => false,
 			'aaSorting' => array(),
 			//"fnCreatedRow" => "js:updateFilters"
-			"fnInitComplete" => "js:updateFilters",
+			"fnInitComplete" => "js:function(oSettings) { this.fnUpdateFilters();}",
+			"fnCreatedRow" => "js:function() { this.fnAddMetaData.apply(this, arguments); }",
+			
 			//"sAjaxSource" => null,
 			//'bJQueryUI' => true
 
@@ -39,7 +41,11 @@
          * @var boolean
          */
         public $gracefulDegradation = false;
-
+		/**
+		 * This will add several pieces of metadata to the table rows after creation.
+		 * @var boolean
+		 */
+		public $addMetaData = true;
 
 		protected function createDataArray()
 		{
@@ -55,8 +61,13 @@
                     ob_start();
 					$column->renderDataCell($i);
 					$row[] = $this->removeOuterTag(ob_get_clean());
-					
                 }
+				if ($this->addMetaData && is_object($r) && method_exists($r, 'getKeyString'))
+				{
+					$row[] = array(
+						'data-key' => $r->getKeyString(),
+					);
+				}
                 $data[] = $row;
             }
 			$this->dataProvider->setPagination($paginator);
@@ -209,8 +220,15 @@
          */
         public function renderItems()
         {
-			echo "<table class=\"dataTable {$this->itemsCssClass}\">\n";
+			$options = array(
+				'class' => "dataTable {$this->itemsCssClass}"
+			);
 
+			if ($this->addMetaData)
+			{
+				$options['data-model'] = get_class($this->dataProvider->getData()[0]);
+			}
+			echo CHtml::openTag('table', $options);
 			$this->renderTableHeader();
 
 			if (!$this->gracefulDegradation)
