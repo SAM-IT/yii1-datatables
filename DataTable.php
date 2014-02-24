@@ -226,7 +226,7 @@
 
 			if ($this->addMetaData)
 			{
-				$options['data-model'] = get_class($this->dataProvider->getData()[0]);
+				$options['data-model'] = $this->dataProvider->modelClass;
 			}
 			echo CHtml::openTag('table', $options);
 			$this->renderTableHeader();
