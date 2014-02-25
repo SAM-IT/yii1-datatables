@@ -49,4 +49,5 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallba
             fnCallback( oSettings );
         }
     }, oSettings );
+	return this;
 };
