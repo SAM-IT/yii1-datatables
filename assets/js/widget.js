@@ -152,7 +152,6 @@ $.fn.dataTableExt.oApi.fnUpdateFilters = function ( oSettings)
 // Function for adding metadata to rows. Data is passed in the "extra column".
 $.fn.dataTableExt.oApi.fnAddMetaData = function (oSettings, nRow, aData, iDataIndex)
 {
-	console.log('adding metadata');
 	if (aData.length > $(nRow).children().length )
 	{
 		$(nRow).attr(aData[aData.length -1]);
