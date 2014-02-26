@@ -224,7 +224,7 @@
 				'class' => "dataTable {$this->itemsCssClass}"
 			);
 
-			if ($this->addMetaData)
+			if ($this->addMetaData && isset($this->dataProvider->modelClass))
 			{
 				$options['data-model'] = $this->dataProvider->modelClass;
 			}
