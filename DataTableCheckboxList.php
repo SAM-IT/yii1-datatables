@@ -13,6 +13,7 @@
 			parent::init();
 			$this->checkBoxColumn = array_merge(array(
 				'class' => 'CCheckBoxColumn',
+				'headerTemplate' => "{item}",
 				'checked' => function($model, $row, $source) { 
 					if(is_array($this->model->{$this->attribute}))
 					{
@@ -44,6 +45,10 @@
 
 			$this->checkBoxColumn['checkBoxHtmlOptions']['name'] = $this->htmlOptions['name'];
 			$this->options['columns'][] = $this->checkBoxColumn;
+			if (!isset($this->options['id']))
+			{
+				$this->options['id'] = $this->resolveNameID()[1];
+			}
 		}
 		public function run()
 		{
