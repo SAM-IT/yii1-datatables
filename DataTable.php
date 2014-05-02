@@ -135,6 +135,10 @@
 							$columnConfig['type'] = 'html';
 					}
 				}
+				elseif ($column instanceof CLinkColumn)
+				{
+					$columnConfig['type'] = 'html'; 
+				}
 
 				// Set width if applicable.
 				if (isset($column->htmlOptions['width']))
