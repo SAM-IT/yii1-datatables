@@ -14,7 +14,7 @@
          */
         public $columns = array();
         public $enablePagination = true;
-        public $itemsCssClass = 'table';
+        public $itemsCssClass = 'display';
         public $pageSize = 10;
 		public $onInit = ['this.fnUpdateFilters();'];
 		/*
@@ -25,7 +25,6 @@
         protected $config = array(
             'info' => true,
             'lengthChange' => false,
-			'ordering' => true,
 			"createdRow" => "js:function() { this.fnAddMetaData.apply(this, arguments); }",
 			
 			//"sAjaxSource" => null,
@@ -89,8 +88,8 @@
 				$this->itemsCssClass .= ' multiSelect';
 				$this->config['fnInitComplete'] = new CJavaScriptExpression("function() { $(this).find('tr input:checked').each(function() { $(this).closest('tr').addClass('selected'); }); }");
 			}
-            $this->config["bPaginate"] = $this->enablePagination;// && $this->dataProvider->getTotalItemCount() > $this->pageSize;
-			$this->config["iDisplayLength"] = $this->pageSize;
+            $this->config["paging"] = $this->enablePagination;// && $this->dataProvider->getTotalItemCount() > $this->pageSize;
+//			$this->config["lengthChange"] = $this->pageSize;
             $this->config["oLanguage"]["sInfo"] = Yii::t('app', "Showing entries {start} to {end} out of {total}", array(
                 '{start}' => '_START_',
                 '{end}' => '_END_',
@@ -199,7 +198,7 @@
 			{
 				$this->config['initComplete'] = new CJavaScriptExpression("function (settings, json) {\n" . implode("\n", $this->onInit) . "\n}");
 			}
-
+			$this->config['ordering'] = $this->enableSorting;
 
 			Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " > table').dataTable(" . CJavaScript::encode($this->config) . "));", CClientScript::POS_READY);
         }
