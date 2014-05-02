@@ -16,18 +16,17 @@
         public $enablePagination = true;
         public $itemsCssClass = 'table';
         public $pageSize = 10;
+		public $onInit = ['this.fnUpdateFilters();'];
 		/*
 		 * @var CActiveDataProvider
 		 */
 		public $dataProvider;
 
         protected $config = array(
-            'bInfo' => true,
-            'bLengthChange' => false,
-			'aaSorting' => array(),
-			//"fnCreatedRow" => "js:updateFilters"
-			"fnInitComplete" => "js:function(oSettings) { this.fnUpdateFilters();}",
-			"fnCreatedRow" => "js:function() { this.fnAddMetaData.apply(this, arguments); }",
+            'info' => true,
+            'lengthChange' => false,
+			'ordering' => true,
+			"createdRow" => "js:function() { this.fnAddMetaData.apply(this, arguments); }",
 			
 			//"sAjaxSource" => null,
 			//'bJQueryUI' => true
@@ -107,7 +106,10 @@
 			$this->config["bFilter"] = !is_null($this->filter);
 			$this->config["sDom"] = 'lrtip';
 
-			$this->config["sAjaxSource"] = $this->ajaxUrl;
+			if (isset($this->ajaxUrl))
+			{
+				$this->onInit[] = "settings.ajax = " . json_encode($this->ajaxUrl);
+			}
 			Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "", CClientScript::POS_READY);
         }
 
@@ -117,27 +119,27 @@
 			foreach ($this->columns as $column)
             {
 				$columnConfig = array(
-                    'bSortable' => $this->enableSorting && isset($column->sortable) && $column->sortable,
+                    'orderable' => $this->enableSorting && isset($column->sortable) && $column->sortable,
 				);
 				if ($column instanceof CDataColumn)
 				{
 					switch ($column->type)
 					{
 						case 'number':
-							$columnConfig['sType'] = 'numeric';
+							$columnConfig['type'] = 'numeric';
 							break;
 						case 'datetime':
-							$columnConfig['sType'] = 'date';
+							$columnConfig['type'] = 'date';
 							break;
 						default:
-							$columnConfig['sType'] = 'html';
+							$columnConfig['type'] = 'html';
 					}
 				}
 
 				// Set width if applicable.
 				if (isset($column->htmlOptions['width']))
 				{
-					$columnConfig['sWidth'] = $column->htmlOptions['width'];
+					$columnConfig['width'] = $column->htmlOptions['width'];
 				}
 
 				// Set style if applicable.
@@ -152,9 +154,9 @@
 				// Set class if applicable.
 				if (isset($column->htmlOptions['class']))
 				{
-					$columnConfig['sClass'] = $column->htmlOptions['class'];
+					$columnConfig['className'] = $column->htmlOptions['class'];
 				}
-				$this->config["aoColumns"][] = $columnConfig;
+				$this->config["columns"][] = $columnConfig;
             }
         }
 
@@ -162,16 +164,17 @@
 		{
 			$url = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/assets', false, -1, YII_DEBUG);
             Yii::app()->getClientScript()->registerPackage('jQuery');
-            if (defined(YII_DEBUG))
+			if (defined('YII_DEBUG') && YII_DEBUG)
             {
                 Yii::app()->getClientScript()->registerScriptFile($url . '/js/jquery.dataTables.js');
+				Yii::app()->getClientScript()->registerCssFile($url . '/css/jquery.dataTables.css');
             }
             else
             {
                 Yii::app()->getClientScript()->registerScriptFile($url . '/js/jquery.dataTables.min.js');
+				Yii::app()->getClientScript()->registerCssFile($url . '/css/jquery.dataTables.min.css');
             }
-			Yii::app()->getClientScript()->registerScriptFile($url . '/js/datatables.reload.js');
-            Yii::app()->getClientScript()->registerCssFile($url . '/css/jquery.dataTables.css');
+			
 			Yii::app()->getClientScript()->registerCssFile($url . '/css/overrides.css');
 			Yii::app()->getClientScript()->registerScriptFile($url . '/js/widget.js');
         }
@@ -182,11 +185,15 @@
          */
         protected function renderData()
         {
-            $this->config['aaData'] = $this->createDataArray();
-			if (isset($this->config["sAjaxSource"]))
+            $this->config['data'] = $this->createDataArray();
+			if (isset($this->config["ajax"]))
 			{
-				$this->config["iDeferLoading"] = $this->dataProvider->getTotalItemCount();
-				$this->config["bServerSide"] = true;
+//				$this->config["deferLoading"] = $this->dataProvider->getTotalItemCount();
+//				$this->config["serverSide"] = true;
+			}
+			if (!empty($this->onInit))
+			{
+				$this->config['initComplete'] = new CJavaScriptExpression("function (settings, json) {\n" . implode("\n", $this->onInit) . "\n}");
 			}
 
 
@@ -260,9 +267,9 @@
         public function run() {
 			if (Yii::app()->getRequest()->getIsAjaxRequest())
 			{
-				$result = array(
-					'aaData' => $this->createDataArray()
-				);
+				$result = ['aaData' => $this->createDataArray()];
+				$result['iTotalRecords'] = count($result['aaData']);
+				$result['iTotalDisplayRecords'] = count($result['aaData']);
 				header("Content-Type: application/json");
 				echo json_encode($result);
 			}
