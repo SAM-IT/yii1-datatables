@@ -25,3 +25,10 @@ table.dataTable thead th.sorting_disabled {
 table.dataTable .nowrap {
 	white-space: nowrap;
 }
+
+table.dataTable thead th, table.dataTable thead td {
+	padding: 5px 18px 5px 10px;
+}
+table.dataTable thead th.sorting_disabled, table.dataTable thead td.sorting_disabled {
+	padding: 5px 10px 5px 10px;
+}
