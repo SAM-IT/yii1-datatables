@@ -89,7 +89,7 @@
 				$this->config['fnInitComplete'] = new CJavaScriptExpression("function() { $(this).find('tr input:checked').each(function() { $(this).closest('tr').addClass('selected'); }); }");
 			}
             $this->config["paging"] = $this->enablePagination;// && $this->dataProvider->getTotalItemCount() > $this->pageSize;
-//			$this->config["lengthChange"] = $this->pageSize;
+			$this->config["pageLength"] = $this->pageSize;
             $this->config["oLanguage"]["sInfo"] = Yii::t('app', "Showing entries {start} to {end} out of {total}", array(
                 '{start}' => '_START_',
                 '{end}' => '_END_',
