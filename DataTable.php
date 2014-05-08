@@ -58,7 +58,15 @@
                 {
                     ob_start();
 					$column->renderDataCell($i);
-					$row[] = $this->removeOuterTag(ob_get_clean());
+					
+					if (property_exists($column, 'type') && $column->type == 'number')
+					{
+						$row[] = (int) $this->removeOuterTag(ob_get_clean());
+					}
+					else
+					{
+						$row[] = $this->removeOuterTag(ob_get_clean());
+					}
                 }
 				if ($this->addMetaData && is_object($r) && method_exists($r, 'getKeyString'))
 				{
