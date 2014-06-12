@@ -77,6 +77,58 @@ $(document).ready(function() {
 	$('table.dataTable').on('change', 'tr.filters select', function(e) {
 			$(this).closest('table').dataTable().fnFilter($(this).val(), $(this).parent().index());
 		});
+
+	$('table.dataTable').on('init.dt', function(e, settings, json) {
+		console.log('init');
+		if (typeof json == 'undefined')
+		{
+			json = {
+				'aaData' : settings.oInstance.fnGetData()
+			};
+			
+		}
+		$(this).trigger('dataload.dt', [settings, json]);
+		
+
+	});
+	$('table.dataTable').on('xhr.dt', function(e, settings, json) {
+		if ($(this).attr('id') == 'DataTables_Table_2')
+		{
+			$(this).one('draw.dt', function() {
+				$(this).trigger('dataload.dt', [settings, json]);
+			});
+		}
+	});
+	/*
+	 * Update filters
+	 */
+	$('table.dataTable').on('dataload.dt', function(e, settings, json) {
+		console.log('dataload');
+		console.log(json);
+		for (var i in settings.aoColumns)
+		{
+			if (typeof settings.aoColumns[i].sFilter != 'undefined' && settings.aoColumns[i].sFilter == 'select')
+			{
+				var values = {};
+				for (var j in json.aaData)
+				{
+					values[json.aaData[j][i]] = 1;
+				}
+				var options = Object.keys(values).sort();
+				var select = $('tr.filters th:nth(' + i + ') select')
+
+				select.find('option').remove();
+				select.append('<option value="">No filter</option>');
+
+				for (var k in options)
+				{
+					select.append("<option>" + options[k] + "</option>");
+				}
+			}
+			
+
+		}
+	})
 });
 
 (function($) {
@@ -133,21 +185,6 @@ $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique,
     return asResultData;
 }}(jQuery));
 
-
-// Function for updating filters.
-$.fn.dataTableExt.oApi.fnUpdateFilters = function ( oSettings)
-{
-	oSettings.oInstance.find('.filters select').each(function() {
-		var select = $(this);
-		select.find('option').remove();
-
-		select.append('<option value="">No filter</option>');
-		$.each(oSettings.oInstance.fnGetColumnData($(this).parent().index()), function() {
-			select.append("<option>" + this + "</option>");
-		});
-	});
-
-}
 
 // Function for adding metadata to rows. Data is passed in the "extra column".
 $.fn.dataTableExt.oApi.fnAddMetaData = function (oSettings, nRow, aData, iDataIndex)

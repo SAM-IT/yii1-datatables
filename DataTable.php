@@ -16,7 +16,7 @@
         public $enablePagination = true;
         public $itemsCssClass = 'display';
         public $pageSize = 10;
-		public $onInit = ['this.fnUpdateFilters();'];
+		public $onInit = [];
 		/*
 		 * @var CActiveDataProvider
 		 */
@@ -167,6 +167,12 @@
 				{
 					$columnConfig['className'] = $column->htmlOptions['class'];
 				}
+				
+				// Set filter.
+				if (isset($column->filter))
+				{
+					$columnConfig['sFilter'] = $column->filter;
+				}
 				$this->config["columns"][] = $columnConfig;
             }
         }
@@ -221,9 +227,9 @@
 					echo "<th>";
 					if (isset($column->filter) && $column->filter == 'select')
 					{
-						echo CHtml::dropDownList('filter', null, array());
+						echo CHtml::dropDownList('filter', null, [], ['id' => "filter_" . $column->id]);
 					}
-					elseif (!isset($column->filter) ||  $column->filter !== false)
+					elseif (property_exists($column, 'filter') &&  $column->filter !== false)
 					{
 						echo CHtml::textField('filter');
 					}
