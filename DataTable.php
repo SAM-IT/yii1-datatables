@@ -6,6 +6,17 @@
     class DataTable extends CGridView
     {
 
+		/**
+		 * If set, datatable will refresh on select event.
+		 * @var string Name of the model the data in this table depends on.
+		 */
+		public $baseModel;
+		/**
+		 * Set to true to listen to create / delete / update events for the model.
+		 * @var boolean
+		 */
+		public $listen = true;
+		public $route;
 		public $selectableRows = 0;
 		public $filterPosition = self::FILTER_POS_HEADER;
         /**
@@ -26,7 +37,7 @@
             'info' => true,
             'lengthChange' => false,
 			"createdRow" => "js:function() { this.fnAddMetaData.apply(this, arguments); }",
-			
+			'processing' => false
 			//"sAjaxSource" => null,
 			//'bJQueryUI' => true
 
@@ -53,24 +64,25 @@
 			$this->dataProvider->setPagination(false);
 			foreach ($this->dataProvider->getData(true) as $i => $r)
             {
-                $row = array();
+                $row = [];
                 foreach ($this->columns as $column)
                 {
+					$name = $this->getColumnName($column);
                     ob_start();
 					$column->renderDataCell($i);
 					
 					if (property_exists($column, 'type') && $column->type == 'number')
 					{
-						$row[] = (int) $this->removeOuterTag(ob_get_clean());
+						$row[$name] = (int) $this->removeOuterTag(ob_get_clean());
 					}
 					else
 					{
-						$row[] = $this->removeOuterTag(ob_get_clean());
+						$row[$name] = $this->removeOuterTag(ob_get_clean());
 					}
                 }
 				if ($this->addMetaData && is_object($r) && method_exists($r, 'getKeyString'))
 				{
-					$row[] = array(
+					$row['metaData'] = array(
 						'data-key' => $r->getKeyString(),
 					);
 				}
@@ -79,7 +91,18 @@
 			$this->dataProvider->setPagination($paginator);
 			return $data;
 		}
-        
+
+		protected function getColumnName($column)
+		{
+			if (isset($column->name))
+			{
+				return strtr($column->name, ['.' => '_']);
+			}
+			else
+			{
+				return $column->id;
+			}
+		}
         public function init()
 		{
 			if(!isset($this->htmlOptions['class']))
@@ -117,7 +140,7 @@
 			{
 				$this->onInit[] = "settings.ajax = " . json_encode($this->ajaxUrl);
 			}
-			Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "", CClientScript::POS_READY);
+			Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "", CClientScript::POS_END);
         }
 
         protected function initColumns()
@@ -128,6 +151,8 @@
 				$columnConfig = array(
                     'orderable' => $this->enableSorting && isset($column->sortable) && $column->sortable,
 				);
+
+				$columnConfig['data'] = $this->getColumnName($column);
 				if ($column instanceof CDataColumn)
 				{
 					switch ($column->type)
@@ -183,17 +208,17 @@
             Yii::app()->getClientScript()->registerPackage('jQuery');
 			if (defined('YII_DEBUG') && YII_DEBUG)
             {
-                Yii::app()->getClientScript()->registerScriptFile($url . '/js/jquery.dataTables.js');
+                Yii::app()->getClientScript()->registerScriptFile($url . '/js/jquery.dataTables.js', CClientScript::POS_END);
 				Yii::app()->getClientScript()->registerCssFile($url . '/css/jquery.dataTables.css');
             }
             else
             {
-                Yii::app()->getClientScript()->registerScriptFile($url . '/js/jquery.dataTables.min.js');
+                Yii::app()->getClientScript()->registerScriptFile($url . '/js/jquery.dataTables.min.js', CClientScript::POS_END);
 				Yii::app()->getClientScript()->registerCssFile($url . '/css/jquery.dataTables.min.css');
             }
 			
 			Yii::app()->getClientScript()->registerCssFile($url . '/css/overrides.css');
-			Yii::app()->getClientScript()->registerScriptFile($url . '/js/widget.js');
+			Yii::app()->getClientScript()->registerScriptFile($url . '/js/widget.js', CClientScript::POS_END);
         }
 
 
@@ -248,9 +273,12 @@
 				'class' => "dataTable {$this->itemsCssClass}"
 			);
 
-			if ($this->addMetaData && isset($this->dataProvider->modelClass))
+			$options['data-model'] = $this->dataProvider->modelClass;
+			$options['data-basemodel'] = $this->baseModel;
+			$options['data-route'] = $this->route;
+			if ($this->listen)
 			{
-				$options['data-model'] = $this->dataProvider->modelClass;
+				$options['data-listen'] = $this->listen;
 			}
 			echo CHtml::openTag('table', $options);
 			$this->renderTableHeader();
@@ -284,9 +312,9 @@
         public function run() {
 			if (Yii::app()->getRequest()->getIsAjaxRequest())
 			{
-				$result = ['aaData' => $this->createDataArray()];
-				$result['iTotalRecords'] = count($result['aaData']);
-				$result['iTotalDisplayRecords'] = count($result['aaData']);
+				$result = ['data' => $this->createDataArray()];
+				$result['iTotalRecords'] = count($result['data']);
+				$result['iTotalDisplayRecords'] = count($result['data']);
 				header("Content-Type: application/json");
 				echo json_encode($result);
 			}

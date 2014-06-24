@@ -1,3 +1,5 @@
+
+$.fn.dataTableExt.errMode = 'throw';
 /*
  * Add some extra functionality for easier usage within Yii.
  */
@@ -70,41 +72,45 @@ $(document).ready(function() {
 	/**
 	 * Filter hooks
 	 */
-	$('table.dataTable').on('keyup', 'tr.filters input', function(e) {
+	$('body').on('keyup', 'table.dataTable tr.filters input', function(e) {
 		$(this).closest('table').dataTable().fnFilter($(this).val(), $(this).parent().index());
 	});
 	
-	$('table.dataTable').on('change', 'tr.filters select', function(e) {
-			$(this).closest('table').dataTable().fnFilter($(this).val(), $(this).parent().index());
-		});
+	$('body').on('change', 'table.dataTable tr.filters select', function(e) {
+		$(this).closest('table').dataTable().fnFilter($(this).val(), $(this).parent().index());
+	});
 
-	$('table.dataTable').on('init.dt', function(e, settings, json) {
-		console.log('init');
+	$('body').on('init.dt', 'table.dataTable', function(e, settings, json) {
 		if (typeof json == 'undefined')
 		{
 			json = {
-				'aaData' : settings.oInstance.fnGetData()
+				'data' : settings.oInstance.fnGetData()
 			};
 			
 		}
 		$(this).trigger('dataload.dt', [settings, json]);
-		
-
 	});
-	$('table.dataTable').on('xhr.dt', function(e, settings, json) {
-		if ($(this).attr('id') == 'DataTables_Table_2')
+
+	$('body').on('processing.dt', 'table.dataTable', function(e, settings, processing) {
+		if (processing)
 		{
-			$(this).one('draw.dt', function() {
-				$(this).trigger('dataload.dt', [settings, json]);
-			});
+			$(this).parent().parent().parent().trigger('startLoading');
 		}
+		else
+		{
+			$(this).parent().parent().parent().trigger('endLoading');
+		}
+	});
+
+	$('body').on('xhr.dt', 'table.dataTable', function(e, settings, json) {
+		$(this).one('draw.dt', function() {
+			$(this).trigger('dataload.dt', [settings, json]);
+		});
 	});
 	/*
 	 * Update filters
 	 */
 	$('table.dataTable').on('dataload.dt', function(e, settings, json) {
-		console.log('dataload');
-		console.log(json);
 		for (var i in settings.aoColumns)
 		{
 			if (typeof settings.aoColumns[i].sFilter != 'undefined' && settings.aoColumns[i].sFilter == 'select')
@@ -129,6 +135,9 @@ $(document).ready(function() {
 
 		}
 	})
+	$('table.dataTable').on('xhr.dt', function(e, settings, json) {
+		console.log('xhr');
+	});
 });
 
 (function($) {
@@ -189,9 +198,9 @@ $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique,
 // Function for adding metadata to rows. Data is passed in the "extra column".
 $.fn.dataTableExt.oApi.fnAddMetaData = function (oSettings, nRow, aData, iDataIndex)
 {
-	if (aData.length > $(nRow).children().length )
+	if (typeof aData.metaData != 'undefined')
 	{
-		$(nRow).attr(aData[aData.length -1]);
+		$(nRow).attr(aData.metaData);
 	}
 }
 
@@ -208,3 +217,20 @@ jQuery.extend( jQuery.fn.dataTableExt.oSort, {
         return ((a < b) ? 1 : ((a > b) ? -1 : 0));
     }
 } );
+
+Befound.ready(function() {
+	var ns = Befound.App.name;
+	$(document).on('select.' + ns, function(event, model, id) {
+		var selector = 'table.dataTable[data-basemodel=' + model + '][data-route][data-listen]';
+		$(selector).each(function() {
+			$(this).dataTable().api().ajax.url(Befound.App.createUrl($(this).data('route'), {'id' : id})).load();
+		})
+	});
+	$(document).on('update.' + ns + ' create.' + ns + ' delete.' + ns, function(event, model, id) {
+		var selector = 'table.dataTable[data-model=' + model + '][data-route][data-listen]';
+		$(selector).each(function() {
+			$(this).dataTable().api().ajax.reload();
+		})
+
+	});
+});
