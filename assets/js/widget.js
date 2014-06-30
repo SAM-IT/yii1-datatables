@@ -1,5 +1,3 @@
-
-$.fn.dataTableExt.errMode = 'throw';
 /*
  * Add some extra functionality for easier usage within Yii.
  */
@@ -81,6 +79,17 @@ $(document).ready(function() {
 	});
 
 	$('body').on('init.dt', 'table.dataTable', function(e, settings, json) {
+		settings.oApi._fnLog = function ( settings, level, msg, tn ) {
+			msg = 'DataTables warning: '+
+				(settings!==null ? 'table id='+settings.sTableId+' - ' : '')+msg;
+
+			if ( tn ) {
+				msg += '. For more information about this error, please see '+
+				'http://datatables.net/tn/'+tn;
+			}
+
+			console.log("DataTable: " + msg);
+		};
 		if (typeof json == 'undefined')
 		{
 			json = {
@@ -135,9 +144,6 @@ $(document).ready(function() {
 
 		}
 	})
-	$('table.dataTable').on('xhr.dt', function(e, settings, json) {
-		console.log('xhr');
-	});
 });
 
 (function($) {

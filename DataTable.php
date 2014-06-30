@@ -138,9 +138,8 @@
 
 			if (isset($this->ajaxUrl))
 			{
-				$this->onInit[] = "settings.ajax = " . json_encode($this->ajaxUrl);
+				$this->config['ajax']['url'] = $this->ajaxUrl;
 			}
-			Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "", CClientScript::POS_END);
         }
 
         protected function initColumns()
