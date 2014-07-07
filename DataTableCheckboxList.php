@@ -13,7 +13,7 @@
 			parent::init();
 			$this->checkBoxColumn = array_merge(array(
 				'class' => 'CCheckBoxColumn',
-				'headerTemplate' => "{item}",
+				'headerTemplate' => '{item}',
 				'checked' => function($model, $row, $source) { 
 					if(is_array($this->model->{$this->attribute}))
 					{
@@ -25,8 +25,11 @@
 					}
 				}
 			), $this->checkBoxColumn);
-			
-			
+
+			if (isset($this->checkBoxColumn['header']))
+			{
+				$this->checkBoxColumn['headerTemplate'] = $this->checkBoxColumn['header'] . '&nbsp;&nbsp;' . $this->checkBoxColumn['headerTemplate'];
+			}
 			if ($this->multiple)
 			{
 				$this->options['selectableRows'] = 2;
