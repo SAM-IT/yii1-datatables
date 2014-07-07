@@ -121,20 +121,20 @@
 			}
             $this->config["paging"] = $this->enablePagination;// && $this->dataProvider->getTotalItemCount() > $this->pageSize;
 			$this->config["pageLength"] = $this->pageSize;
-            $this->config["oLanguage"]["sInfo"] = Yii::t('app', "Showing entries {start} to {end} out of {total}", array(
+            $this->config["language"]["info"] = Yii::t('app', "Showing entries {start} to {end} out of {total}", array(
                 '{start}' => '_START_',
                 '{end}' => '_END_',
                 '{total}' => '_TOTAL_'
             ));
-            $this->config["oLanguage"]["sEmptyTable"] = Yii::t('app', "No data available in table");
-            $this->config["oLanguage"]["sInfoEmpty"] = Yii::t('app', "Showing entries 0 to 0 out of 0");
-            $this->config["oLanguage"]["sInfoFiltered"] = Yii::t('app', "- filtering from {max} record(s)", array(
+            $this->config["language"]["emptyTable"] = Yii::t('app', "No data available in table");
+            $this->config["language"]["infoEmpty"] = Yii::t('app', "Showing entries 0 to 0 out of 0");
+            $this->config["language"]["infoFiltered"] = Yii::t('app', "- filtering from {max} record(s)", array(
                 '{max}' => '_MAX_',
             ));
 
-			$this->config["bSort"] = $this->enableSorting;
-			$this->config["bFilter"] = !is_null($this->filter);
-			$this->config["sDom"] = 'lrtip';
+			$this->config["ordering"] = $this->enableSorting;
+			$this->config["searching"] = !is_null($this->filter);
+			$this->config["dom"] = 'lrtip';
 
 			if (isset($this->ajaxUrl))
 			{
@@ -204,7 +204,7 @@
         public function registerClientScript()
 		{
 			$url = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/assets', false, -1, YII_DEBUG);
-            Yii::app()->getClientScript()->registerPackage('jQuery');
+            Yii::app()->getClientScript()->registerPackage('jquery');
 			if (defined('YII_DEBUG') && YII_DEBUG)
             {
                 Yii::app()->getClientScript()->registerScriptFile($url . '/js/jquery.dataTables.js', CClientScript::POS_END);
