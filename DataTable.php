@@ -103,6 +103,27 @@
 				return $column->id;
 			}
 		}
+
+		public function getId($autoGenerate = true) {
+			static $ids = [];
+			if (parent::getId(false) == null && $autoGenerate)
+			{
+				// Generate a unique id that does not depend on the number of widgets on the page
+				// but on the column configuration.
+				$id = 'dt_' . substr(md5(json_encode($this->columns)), 0, 5);
+				if (!in_array($id, $ids))
+				{
+					$this->setId($id);
+					$ids[] = $id;
+				}
+				else
+				{
+					throw new Exception("Duplicate ID");
+				}
+
+			}
+			return parent::getId($autoGenerate);
+		}
         public function init()
 		{
 			if(!isset($this->htmlOptions['class']))
