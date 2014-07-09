@@ -105,22 +105,17 @@
 		}
 
 		public function getId($autoGenerate = true) {
-			static $ids = [];
+			static $hashes = [];
 			if (parent::getId(false) == null && $autoGenerate)
 			{
 				// Generate a unique id that does not depend on the number of widgets on the page
 				// but on the column configuration.
-				$id = 'dt_' . substr(md5(json_encode($this->columns)), 0, 5);
-				if (!in_array($id, $ids))
+				$hash = substr(md5(json_encode($this->columns)), 0, 5);
+				while (in_array($hash, $hashes))
 				{
-					$this->setId($id);
-					$ids[] = $id;
+					$hash = substr(md5($hash), 0, 5);
 				}
-				else
-				{
-					throw new Exception("Duplicate ID");
-				}
-
+				$this->setId('dt_' . $hash);
 			}
 			return parent::getId($autoGenerate);
 		}
