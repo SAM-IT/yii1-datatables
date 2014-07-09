@@ -214,6 +214,15 @@
 					$columnConfig['sFilter'] = $column->filter;
 				}
 				$this->config["columns"][] = $columnConfig;
+
+				/**
+				 * This will force us to render an HTML table instead of passing
+				 * the items directly as json data.
+				 */
+				if (isset($column->hasScript))
+				{
+					$this->gracefulDegradation = true;
+				}
             }
         }
 
@@ -304,9 +313,10 @@
             }
 			else
 			{
-				throw new Exception('Graceful degration not yet supported.');
+				$this->renderTableBody();
+//				throw new Exception('Graceful degration not yet supported.');
 			}
-			echo "</table>";
+			echo CHtml::closeTag('table');
 
         }
 
