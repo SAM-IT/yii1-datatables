@@ -142,7 +142,7 @@
                 '{end}' => '_END_',
                 '{total}' => '_TOTAL_'
             ));
-            $this->config["language"]["emptyTable"] = Yii::t('app', "No data available in table");
+            $this->config["language"]["emptyTable"] = $this->emptyText;
             $this->config["language"]["infoEmpty"] = Yii::t('app', "Showing entries 0 to 0 out of 0");
             $this->config["language"]["infoFiltered"] = Yii::t('app', "- filtering from {max} record(s)", array(
                 '{max}' => '_MAX_',
