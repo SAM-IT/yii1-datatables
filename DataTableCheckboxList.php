@@ -55,6 +55,7 @@
 		}
 		public function run()
 		{
+			$this->options['tagName'] = 'span';
 			$this->widget('DataTable', $this->options);
 		}
 	}
