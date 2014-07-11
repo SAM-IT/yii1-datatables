@@ -23,16 +23,10 @@ $(document).ready(function() {
 
 	// Handle multiple select.
 	$('body').on('click', 'table.dataTable.multiSelect tbody tr', function() {
-		if (!$(this).hasClass('selected'))
-		{
-			$(this).find('input.select-on-check').attr('checked', true);
-			$(this).addClass('selected');
-		}
-		else
-		{
-			$(this).removeClass('selected');
-			$(this).find('input.select-on-check').attr('checked', false);
-		}
+		var $this = $(this);
+		$this.toggleClass('selected');
+		$this.find('input.select-on-check').prop('checked', $this.hasClass('selected'));
+		$this.trigger('change');
 	});
 
 	// Don't propagate click events for inputs.'
@@ -42,6 +36,8 @@ $(document).ready(function() {
 
 	$('body').on('click', 'table.dataTable.multiSelect tbody tr input.select-on-check', function(e) {
 		e.stopPropagation();
+		var $grid = $(this).closest('table');
+		var $checks = $('input.select-on-check', $grid);
 		if (this.checked)
 		{
 			$(this).closest('tr').addClass('selected');
@@ -50,6 +46,8 @@ $(document).ready(function() {
 		{
 			$(this).closest('tr').removeClass('selected');
 		}
+		$("input.select-on-check-all", $grid).prop('checked', $checks.length === $checks.filter(':checked').length);
+
 	});
 
 	$('body').on('click', 'table.dataTable.multiSelect thead tr input.select-on-check-all', function(e) {
@@ -57,12 +55,12 @@ $(document).ready(function() {
 		if (this.checked)
 		{
 			$(this).closest('table').find('tbody tr').addClass('selected');
-			$(this).closest('table').find('tbody tr input.select-on-check').attr('checked', true);
+			$(this).closest('table').find('tbody tr input.select-on-check').prop('checked', true);
 		}
 		else
 		{
 			$(this).closest('table').find('tbody tr').removeClass('selected');
-			$(this).closest('table').find('tbody tr input.select-on-check').attr('checked', false);
+			$(this).closest('table').find('tbody tr input.select-on-check').prop('checked', false);
 		}
 	});
 
