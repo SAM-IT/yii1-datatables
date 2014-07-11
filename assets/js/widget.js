@@ -137,10 +137,10 @@ $(document).ready(function() {
 				{
 					select.append("<option>" + options[k] + "</option>");
 				}
+				select.trigger('change');
 			}
-			
-
 		}
+
 	})
 });
 
