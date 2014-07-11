@@ -125,9 +125,9 @@ $(document).ready(function() {
 			if (typeof settings.aoColumns[i].sFilter != 'undefined' && settings.aoColumns[i].sFilter == 'select')
 			{
 				var values = {};
-				for (var j in json.aaData)
+				for (var j in json.data)
 				{
-					values[json.aaData[j][i]] = 1;
+					values[json.data[j][settings.aoColumns[i].data]] = 1;
 				}
 				var options = Object.keys(values).sort();
 				var select = $('tr.filters th:nth(' + i + ') select')
@@ -159,6 +159,7 @@ $(document).ready(function() {
  * Author:   Benedikt Forchhammer <b.forchhammer /AT\ mind2.de>
  */
 $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique, bFiltered, bIgnoreEmpty ) {
+	console.log('getting data');
     // check that we have a column id
     if ( typeof iColumn == "undefined" ) return new Array();
      
