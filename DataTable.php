@@ -274,9 +274,17 @@
 				foreach($this->columns as $column)
 				{
 					echo "<th>";
-					if (isset($column->filter) && $column->filter == 'select')
+					if (isset($column->filter) && $column->filter === 'select')
 					{
 						echo CHtml::dropDownList('filter', null, [], ['id' => "filter_" . $column->id]);
+					}
+					elseif (isset($column->filter) && $column->filter === 'select2')
+					{
+						$this->widget('Befound\Widgets\Select2', [
+							'htmlOptions' => ['id' => "filter_" . $column->id],
+							'name' => $column->name,
+							'items' => []
+						]);
 					}
 					elseif (property_exists($column, 'filter') &&  $column->filter !== false)
 					{
