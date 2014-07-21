@@ -176,6 +176,7 @@
 							$columnConfig['type'] = 'numeric';
 							break;
 						case 'datetime':
+						case 'date':
 							$columnConfig['type'] = 'date';
 							break;
 						default:
