@@ -91,15 +91,18 @@
 					{
 						$metaRow['data-key'] = call_user_func([$r, 'getKeyString']);
 					};
-					foreach ($this->addMetaData as $field)
+					if (is_array($this->addMetaData))
 					{
-						if (is_object($r))
+						foreach ($this->addMetaData as $field)
 						{
-							$row[$field] = $r->$field;
-						}
-						elseif (is_array($r))
-						{
-							$row[$field] = $r[$field];
+							if (is_object($r))
+							{
+								$row[$field] = $r->$field;
+							}
+							elseif (is_array($r))
+							{
+								$row[$field] = $r[$field];
+							}
 						}
 					}
 					$row['metaData'] = $metaRow;
