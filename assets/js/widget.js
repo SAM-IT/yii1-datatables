@@ -144,7 +144,8 @@ $(document).ready(function() {
 			{
 				var select = $('tr.filters th:nth(' + i + ') select')
 				select.find('option').remove();
-				select.append('<option value="">No filter</option>');
+
+				select.append('<option value="">' + settings.oLanguage.filter.none + '</option>');
 				if (typeof json != 'undefined')
 				{
 					json.data.map(function (currentValue, index) {
