@@ -50,9 +50,13 @@
          * @var boolean
          */
         public $gracefulDegradation = false;
+
 		/**
-		 * This will add several pieces of metadata to the table rows after creation.
-		 * @var boolean
+		 * If true adds the models' key to the metadata.
+		 * If an array adds the fields mentioned in the array (and the key)
+		 * to the metadata.
+		 *
+		 * @var mixed
 		 */
 		public $addMetaData = true;
 
@@ -80,11 +84,25 @@
 						$row[$name] = $this->removeOuterTag(ob_get_clean());
 					}
                 }
-				if ($this->addMetaData && is_object($r) && method_exists($r, 'getKeyString'))
+				if ($this->addMetaData !== false)
 				{
-					$row['metaData'] = array(
-						'data-key' => $r->getKeyString(),
-					);
+					$metaRow = [];
+					if (is_callable([$r, 'getKeyString']))
+					{
+						$metaRow['data-key'] = call_user_func([$r, 'getKeyString']);
+					};
+					foreach ($this->addMetaData as $field)
+					{
+						if (is_object($r))
+						{
+							$row[$field] = $r->$field;
+						}
+						elseif (is_array($r))
+						{
+							$row[$field] = $r[$field];
+						}
+					}
+					$row['metaData'] = $metaRow;
 				}
                 $data[] = $row;
             }
@@ -178,6 +196,7 @@
 							$columnConfig['type'] = 'numeric';
 							break;
 						case 'datetime':
+						case 'date':
 							$columnConfig['type'] = 'date';
 							break;
 						default:
