@@ -131,11 +131,12 @@
 			{
 				// Generate a unique id that does not depend on the number of widgets on the page
 				// but on the column configuration.
-				$hash = substr(md5(json_encode($this->columns)), 0, 5);
+				$hash = substr(md5(json_encode($this->columns)), 0, 5) . $this->dataProvider->id;
 				while (in_array($hash, $hashes))
 				{
 					$hash = substr(md5($hash), 0, 5);
 				}
+				$hashes[] = $hash;
 				$this->setId('dt_' . $hash);
 			}
 			return parent::getId($autoGenerate);

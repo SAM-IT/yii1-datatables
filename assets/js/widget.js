@@ -86,17 +86,17 @@ $(document).ready(function() {
 
 	$('body').on('init.dt', 'table.dataTable', function(e, settings, json) {
 		// Override the fnLog function.
-//		settings.oApi._fnLog = function ( settings, level, msg, tn ) {
-//			msg = 'DataTables warning: '+
-//				(settings!==null ? 'table id='+settings.sTableId+' - ' : '')+msg;
-//
-//			if ( tn ) {
-//				msg += '. For more information about this error, please see '+
-//				'http://datatables.net/tn/'+tn;
-//			}
-//
-//			console.log("DataTable: " + msg);
-//		};
+		settings.oApi._fnLog = function ( settings, level, msg, tn ) {
+			msg = 'DataTables warning: '+
+				(settings!==null ? 'table id='+settings.sTableId+' - ' : '')+msg;
+
+			if ( tn ) {
+				msg += '. For more information about this error, please see '+
+				'http://datatables.net/tn/'+tn;
+			}
+
+			console.log("DataTable: " + msg);
+		};
 
 		settings.oApi.fnUpdateFilters.call(this, settings, json);
 	});
