@@ -24,10 +24,11 @@
          * @var CGridColumn[]
          */
         public $columns = array();
-        public $enablePagination = true;
         public $itemsCssClass = 'display';
-        public $pageSize = 10;
+//        public $pageSize = 10;
 		public $onInit = [];
+
+		public $pageSizeOptions = [];
 		/*
 		 * @var CActiveDataProvider
 		 */
@@ -35,8 +36,7 @@
 
         protected $config = array(
             'info' => true,
-            'lengthChange' => false,
-			"createdRow" => "js:function() { this.fnAddMetaData.apply(this, arguments); }",
+            "createdRow" => "js:function() { this.fnAddMetaData.apply(this, arguments); }",
 			'processing' => false
 			//"sAjaxSource" => null,
 			//'bJQueryUI' => true
@@ -157,8 +157,15 @@
 				$this->itemsCssClass .= ' multiSelect';
 				$this->config['fnInitComplete'] = new CJavaScriptExpression("function() { $(this).find('tr input:checked').each(function() { $(this).closest('tr').addClass('selected'); }); }");
 			}
-            $this->config["paging"] = $this->enablePagination;// && $this->dataProvider->getTotalItemCount() > $this->pageSize;
-			$this->config["pageLength"] = $this->pageSize;
+            if ($this->dataProvider->pagination !== false && $this->enablePagination)
+			{
+				$this->config["paging"] = true;
+				$this->config["pageLength"] = $this->dataProvider->getPagination()->pageSize;
+			}
+			else
+			{
+				$this->config["paging"] = false;
+			}
             $this->config["language"]["info"] = Yii::t('app', "Showing entries {start} to {end} out of {total}", array(
                 '{start}' => '_START_',
                 '{end}' => '_END_',
@@ -176,6 +183,45 @@
 			$this->config["searching"] = !is_null($this->filter);
 			$this->config["dom"] = 'lrtip';
 
+			if (!empty($this->pageSizeOptions))
+			{
+				$this->config['lengthMenu'] = true;
+				if (key($this->pageSizeOptions) == 0)
+				{
+					$this->config['lengthMenu'] = $this->pageSizeOptions;
+					$oneDimension = true;
+				}
+				else
+				{
+					$oneDimension = false;
+				}
+
+				$this->config['lengthMenu'][0] = [];
+				$this->config['lengthMenu'][1] = [];
+				foreach($this->pageSizeOptions as $key => $value)
+				{
+					if ($oneDimension)
+					{
+						$this->config['lengthMenu'][0][] = $value;
+					}
+					else
+					{
+						$this->config['lengthMenu'][0][] = $key;
+					}
+					if ($value == -1)
+					{
+						$this->config['lengthMenu'][1][] = Yii::t('datatable', 'All');
+					}
+					else
+					{
+						$this->config['lengthMenu'][1][] = $value;
+					}
+				}
+			}
+			else
+			{
+				$this->config['lengthChange'] = false;
+			}
 			if (isset($this->ajaxUrl))
 			{
 				$this->config['ajax']['url'] = $this->ajaxUrl;
