@@ -56,8 +56,11 @@ form .controls:only-child label.checkbox{
 	margin-left: 180px;
 }
 
-.control-group.success .dataTables_length select,
-.control-group.error .dataTables_length select{
+.control-group.success .dataTables_wrapper select,
+.control-group.error .dataTables_wrapper select,
+.control-group.success .dataTables_wrapper input,
+.control-group.error .dataTables_wrapper input
+{
 	border-color: #cccccc;
 	color: #555555;
 }

@@ -191,7 +191,7 @@ $(document).ready(function() {
 	$.valHooks['DataTableCheckBoxList'] = {
 		"get" : function(el) {
 			c = [];
-			$(el).find('table :checked').each(function () {
+			$(el).find('tbody :checked').each(function () {
 				c.push(this.value);
 			});
 			return c.join(',');
