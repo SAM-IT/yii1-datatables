@@ -188,7 +188,7 @@ $(document).ready(function() {
 		}
 	}
 
-	$.valHooks['DataTableCheckboxList'] = {
+	$.valHooks['DataTableCheckBoxList'] = {
 		"get" : function(el) {
 			c = [];
 			$(el).find('table :checked').each(function () {

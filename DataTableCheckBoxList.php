@@ -1,5 +1,5 @@
 <?php
-	class DataTableCheckboxList extends CInputWidget
+	class DataTableCheckBoxList extends CInputWidget
 	{
 		public $checkBoxColumn;
 		public $options;
@@ -7,12 +7,10 @@
 		
 		public $multiple = true;
 
-		public $dataProvider;
-
 		public function init() {
 			parent::init();
 			$this->checkBoxColumn = array_merge(array(
-				'class' => Befound\Widgets\CheckboxColumn::className(),
+				'class' => Befound\Widgets\CheckBoxColumn::className(),
 				'headerTemplate' => '{item}',
 				'checked' => function($model, $row, $source) { 
 					if(is_array($this->model->{$this->attribute}))
@@ -52,13 +50,12 @@
 			{
 				$this->options['id'] = $this->resolveNameID()[1];
 			}
-			$this->options['dataProvider'] = $this->dataProvider;
 		}
 		public function run()
 		{
 			$widget = $this->beginWidget('yii-datatables.DataTable', $this->options);
 			$widget->run();
-			Yii::app()->clientScript->registerScript($widget->id . 'type', new \CJavaScriptExpression("$('#{$widget->id}')[0].type = 'DataTableCheckboxList';"));
+			Yii::app()->clientScript->registerScript($widget->id . 'type', new \CJavaScriptExpression("$('#{$widget->id}')[0].type = 'DataTableCheckBoxList';"));
 		}
 	}
 ?>
