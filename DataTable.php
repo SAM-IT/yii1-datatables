@@ -37,7 +37,7 @@
         protected $config = array(
             'info' => true,
             "createdRow" => "js:function() { this.fnAddMetaData.apply(this, arguments); }",
-			'processing' => false
+			'processing' => false,
 			//"sAjaxSource" => null,
 			//'bJQueryUI' => true
 
@@ -238,7 +238,7 @@
 				);
 
 				$columnConfig['data'] = $this->getColumnName($column);
-				if ($column instanceof CDataColumn)
+				if ($column instanceof \CDataColumn)
 				{
 					switch ($column->type)
 					{
@@ -253,11 +253,14 @@
 							$columnConfig['type'] = 'html';
 					}
 				}
-				elseif ($column instanceof CLinkColumn)
+				elseif ($column instanceof \CLinkColumn)
 				{
 					$columnConfig['type'] = 'html'; 
 				}
-
+				elseif ($column instanceof \CCheckboxColumn)
+				{
+					$columnConfig['type'] = 'html';
+				}
 				// Set width if applicable.
 				if (isset($column->htmlOptions['width']))
 				{
@@ -334,7 +337,7 @@
 			}
 			$this->config['ordering'] = $this->enableSorting;
 
-			Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " > table').dataTable(" . CJavaScript::encode($this->config) . "));", CClientScript::POS_READY);
+			Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " table').dataTable(" . CJavaScript::encode($this->config) . "));", CClientScript::POS_READY);
         }
 
 		public function renderFilter()

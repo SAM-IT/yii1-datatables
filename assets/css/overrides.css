@@ -44,3 +44,20 @@ table.dataTable thead th.sorting_disabled, table.dataTable thead td.sorting_disa
 .success .datatable-view {
 	border: 1px solid #468847;
 }
+
+/**
+ Fix for datatables in form.
+*/
+form .controls:only-child {
+	margin-left: 0px;
+}
+
+form .controls:only-child label.checkbox{
+	margin-left: 180px;
+}
+
+.control-group.success .dataTables_length select,
+.control-group.error .dataTables_length select{
+	border-color: #cccccc;
+	color: #555555;
+}
