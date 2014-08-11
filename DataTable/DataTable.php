@@ -1,9 +1,8 @@
 <?php
-    /**
-     *
-     */
-    Yii::import('zii.widgets.grid.CGridView');
-    class DataTable extends CGridView
+	namespace DataTable;
+	use \Yii, \CHtml, \CJavaScriptExpression;
+
+	class DataTable extends \CGridView
     {
 
 		/**
@@ -60,6 +59,11 @@
 		 */
 		public $addMetaData = true;
 
+		public static function className()
+		{
+			return get_called_class();
+		}
+		
 		protected function createDataArray()
 		{
 			$data = array();
@@ -302,21 +306,25 @@
 
         public function registerClientScript()
 		{
-			$url = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/assets', false, -1, YII_DEBUG);
-            Yii::app()->getClientScript()->registerPackage('jquery');
+			$url = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/../assets', false, -1, YII_DEBUG);
+			$cs = Yii::app()->clientScript;
+            $cs->registerPackage('jquery');
 			if (defined('YII_DEBUG') && YII_DEBUG)
             {
-                Yii::app()->getClientScript()->registerScriptFile($url . '/js/jquery.dataTables.js', CClientScript::POS_END);
-				Yii::app()->getClientScript()->registerCssFile($url . '/css/jquery.dataTables.css');
+                $cs->registerScriptFile($url . '/js/jquery.dataTables.js', $cs::POS_END);
+				$cs->registerCssFile($url . '/css/jquery.dataTables.css');
             }
             else
             {
-                Yii::app()->getClientScript()->registerScriptFile($url . '/js/jquery.dataTables.min.js', CClientScript::POS_END);
-				Yii::app()->getClientScript()->registerCssFile($url . '/css/jquery.dataTables.min.css');
+                $cs->registerScriptFile($url . '/js/jquery.dataTables.min.js', $cs::POS_END);
+				$cs->registerCssFile($url . '/css/jquery.dataTables.min.css');
             }
 			
-			Yii::app()->getClientScript()->registerCssFile($url . '/css/overrides.css');
-			Yii::app()->getClientScript()->registerScriptFile($url . '/js/widget.js', CClientScript::POS_END);
+			$cs->registerCssFile($url . '/css/overrides.css');
+			$cs->registerScriptFile($url . '/js/widget.js', $cs::POS_END);
+			if (isset(Yii::app()->Befound)) {
+				$cs->registerScriptFile($url . '/js/befound.js', $cs::POS_END);
+			}
         }
 
 
@@ -337,7 +345,7 @@
 			}
 			$this->config['ordering'] = $this->enableSorting;
 
-			Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " table').dataTable(" . CJavaScript::encode($this->config) . "));", CClientScript::POS_READY);
+			Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " table').dataTable(" . \CJavaScript::encode($this->config) . "));", \CClientScript::POS_READY);
         }
 
 		public function renderFilter()
@@ -354,7 +362,7 @@
 					}
 					elseif (isset($column->filter) && $column->filter === 'select2')
 					{
-						$this->widget('Befound\Widgets\Select2', [
+						$this->widget(\Befound\Widgets\Select2::className(), [
 							'htmlOptions' => ['id' => "filter_" . $column->id],
 							'name' => $column->name,
 							'items' => []

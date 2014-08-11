@@ -1,5 +1,8 @@
 <?php
-	class DataTableCheckBoxList extends CInputWidget
+	namespace DataTable;
+	use \CHtml, \Yii;
+
+	class CheckBoxList extends \CInputWidget
 	{
 		public $checkBoxColumn;
 		public $options;
@@ -7,10 +10,16 @@
 		
 		public $multiple = true;
 
+		public static function className()
+		{
+			return get_called_class();
+		}
+		
 		public function init() {
 			parent::init();
+			$checkboxClass = class_exists('\Befound\Widgets\CheckBoxColumn') ? \Befound\Widgets\CheckBoxColumn::className() : '\CCheckboxColumn';
 			$this->checkBoxColumn = array_merge(array(
-				'class' => Befound\Widgets\CheckBoxColumn::className(),
+				'class' => $checkboxClass,
 				'headerTemplate' => '{item}',
 				'checked' => function($model, $row, $source) { 
 					if(is_array($this->model->{$this->attribute}))
@@ -53,7 +62,7 @@
 		}
 		public function run()
 		{
-			$widget = $this->beginWidget('yii-datatables.DataTable', $this->options);
+			$widget = $this->beginWidget(DataTable::className(), $this->options);
 			$widget->run();
 			Yii::app()->clientScript->registerScript($widget->id . 'type', new \CJavaScriptExpression("$('#{$widget->id}')[0].type = 'DataTableCheckBoxList';"));
 		}
