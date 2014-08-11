@@ -256,7 +256,7 @@
 				{
 					$columnConfig['type'] = 'html'; 
 				}
-				elseif ($column instanceof \CCheckboxColumn)
+				elseif ($column instanceof \CCheckBoxColumn)
 				{
 					$columnConfig['type'] = 'html';
 				}

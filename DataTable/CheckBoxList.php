@@ -12,7 +12,7 @@
 
 		public function init() {
 			parent::init();
-			$checkboxClass = class_exists(\Befound\Widgets\CheckBoxColumn::CLASS) ? \Befound\Widgets\CheckBoxColumn::CLASS : \CCheckboxColumn::CLASS;
+			$checkboxClass = class_exists(\Befound\Widgets\CheckBoxColumn::CLASS) ? \Befound\Widgets\CheckBoxColumn::CLASS : \CCheckBoxColumn::CLASS;
 			$this->checkBoxColumn = array_merge(array(
 				'class' => $checkboxClass,
 				'headerTemplate' => '{item}',
