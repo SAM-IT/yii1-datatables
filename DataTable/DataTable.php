@@ -59,11 +59,6 @@
 		 */
 		public $addMetaData = true;
 
-		public static function className()
-		{
-			return get_called_class();
-		}
-		
 		protected function createDataArray()
 		{
 			$data = array();
@@ -362,7 +357,7 @@
 					}
 					elseif (isset($column->filter) && $column->filter === 'select2')
 					{
-						$this->widget(\Befound\Widgets\Select2::className(), [
+						$this->widget(\Befound\Widgets\Select2::CLASS, [
 							'htmlOptions' => ['id' => "filter_" . $column->id],
 							'name' => $column->name,
 							'items' => []

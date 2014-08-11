@@ -10,14 +10,9 @@
 		
 		public $multiple = true;
 
-		public static function className()
-		{
-			return get_called_class();
-		}
-		
 		public function init() {
 			parent::init();
-			$checkboxClass = class_exists('\Befound\Widgets\CheckBoxColumn') ? \Befound\Widgets\CheckBoxColumn::className() : '\CCheckboxColumn';
+			$checkboxClass = class_exists(\Befound\Widgets\CheckBoxColumn::CLASS) ? \Befound\Widgets\CheckBoxColumn::CLASS : \CCheckboxColumn::CLASS;
 			$this->checkBoxColumn = array_merge(array(
 				'class' => $checkboxClass,
 				'headerTemplate' => '{item}',
@@ -62,7 +57,7 @@
 		}
 		public function run()
 		{
-			$widget = $this->beginWidget(DataTable::className(), $this->options);
+			$widget = $this->beginWidget(DataTable::CLASS, $this->options);
 			$widget->run();
 			Yii::app()->clientScript->registerScript($widget->id . 'type', new \CJavaScriptExpression("$('#{$widget->id}')[0].type = 'DataTableCheckBoxList';"));
 		}
