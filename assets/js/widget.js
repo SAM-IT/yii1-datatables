@@ -182,7 +182,7 @@ $(document).ready(function() {
 	 */
 	$.fn.dataTableExt.oApi.fnAddMetaData = function (oSettings, nRow, aData)
 	{
-		if (typeof aData.metaData != 'undefined')
+		if (typeof aData.metaData != 'undefined' && aData.metaData.length > 0)
 		{
 			$(nRow).attr(aData.metaData);
 		}
@@ -213,3 +213,47 @@ jQuery.extend( jQuery.fn.dataTableExt.oSort, {
         return ((a < b) ? 1 : ((a > b) ? -1 : 0));
     }
 } );
+
+$.fn.dataTableExt.oApi.fnExportData = function (oSettings, fileName)
+{
+	var r = this.dataTable().fnGetData();
+	var l = r.length;
+	var csv = '';
+	var delim = ',';
+	var quote = '"';
+	var nl = "\n";
+	var escape = function(str) {
+		return quote + str + quote + delim;
+	}
+
+	for (var i in oSettings.aoColumns)
+	{
+		var c = oSettings.aoColumns[i];
+		csv += escape(c.sTitle);
+	}
+	csv += nl;
+
+	for (var i = 0; i < l; i++)
+	{
+		for (var j in oSettings.aoColumns)
+		{
+			var c = oSettings.aoColumns[j];
+			csv += escape(r[i][c.data]);
+		}
+		csv += nl;
+	}
+
+	var a = document.createElement('a');
+	var blob = new Blob([csv], {'type':'text/csv;charset=UTF-8'});
+	a.href = window.URL.createObjectURL(blob);
+	if (typeof fileName != 'undefined')
+	{
+		a.download = fileName;
+	}
+	else
+	{
+		a.download = 'export.csv';
+	}
+	a.click();
+	return true;
+}

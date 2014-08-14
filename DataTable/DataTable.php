@@ -130,7 +130,14 @@
 			{
 				// Generate a unique id that does not depend on the number of widgets on the page
 				// but on the column configuration.
-				$hash = substr(md5(json_encode($this->columns)), 0, 5) . $this->dataProvider->id;
+				if (isset($this->dataProvider->id))
+				{
+					$hash = substr(md5(json_encode($this->columns)), 0, 5) . $this->dataProvider->id;
+				}
+				else
+				{
+					$hash = substr(md5(json_encode($this->columns)), 0, 5);
+				}
 				while (in_array($hash, $hashes))
 				{
 					$hash = substr(md5($hash), 0, 5);
@@ -382,7 +389,10 @@
 				'class' => "dataTable {$this->itemsCssClass}"
 			);
 
-			$options['data-model'] = $this->dataProvider->modelClass;
+			if (isset($this->dataProvider->modelClass))
+			{
+				$options['data-model'] = $this->dataProvider->modelClass;
+			}
 			$options['data-basemodel'] = $this->baseModel;
 			$options['data-route'] = $this->route;
 			if ($this->listen)
