@@ -243,17 +243,11 @@ $.fn.dataTableExt.oApi.fnExportData = function (oSettings, fileName)
 		csv += nl;
 	}
 
-	var a = document.createElement('a');
 	var blob = new Blob([csv], {'type':'text/csv;charset=UTF-8'});
-	a.href = window.URL.createObjectURL(blob);
-	if (typeof fileName != 'undefined')
+	if (typeof fileName == 'undefined')
 	{
-		a.download = fileName;
+		fileName = 'export.csv';
 	}
-	else
-	{
-		a.download = 'export.csv';
-	}
-	a.click();
+	saveAs(blob, fileName);
 	return true;
 }
