@@ -25,4 +25,12 @@ Befound.ready(function() {
 		})
 
 	});
+
+	$(document).on('delete.' + ns, function(event, model, data) {
+		var selector = 'table.dataTable[data-model=' + model + '][data-listen]';
+		$(selector).each(function() {
+			$(this).dataTable().api().row('[data-key=' + data.id + ']').remove().draw();
+		})
+
+	});
 });
