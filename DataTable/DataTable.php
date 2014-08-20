@@ -403,7 +403,7 @@
 
 			if (!$this->gracefulDegradation)
             {
-                $this->renderData();
+				$this->renderData();
             }
 			else
 			{
@@ -420,7 +420,65 @@
         public function renderSummary() {
             //parent::renderSummary();
         }
-		
+
+		/**
+		 * Renders a table body row.
+		 * @param integer $row the row number (zero-based).
+		 */
+		public function renderTableRow($row)
+		{
+			$htmlOptions = array();
+			$data = $this->dataProvider->data[$row];
+			if($this->rowHtmlOptionsExpression!==null)
+			{
+				
+				$options=$this->evaluateExpression($this->rowHtmlOptionsExpression,array('row'=>$row,'data'=>$data));
+				if(is_array($options))
+					$htmlOptions = $options;
+			}
+
+			if($this->rowCssClassExpression!==null)
+			{
+				$data=$this->dataProvider->data[$row];
+				$class=$this->evaluateExpression($this->rowCssClassExpression,array('row'=>$row,'data'=>$data));
+			}
+			elseif(is_array($this->rowCssClass) && ($n=count($this->rowCssClass))>0)
+				$class=$this->rowCssClass[$row%$n];
+
+			if(!empty($class))
+			{
+				if(isset($htmlOptions['class']))
+					$htmlOptions['class'].=' '.$class;
+				else
+					$htmlOptions['class']=$class;
+			}
+
+			if ($this->addMetaData !== false)
+			{
+				if (is_callable([$data, 'getKeyString']))
+				{
+					$htmlOptions['data-key'] = call_user_func([$data, 'getKeyString']);
+				};
+				if (is_array($this->addMetaData))
+				{
+					foreach ($this->addMetaData as $field)
+					{
+						if (is_object($data))
+						{
+							$htmlOptions["data-$field"] = $data->$field;
+						}
+						elseif (is_array($data))
+						{
+							$htmlOptions["data-$field"] = $data[$field];
+						}
+					}
+				}
+			}
+			echo CHtml::openTag('tr', $htmlOptions)."\n";
+			foreach($this->columns as $column)
+				$column->renderDataCell($row);
+			echo "</tr>\n";
+		}
 		public function renderTableHeader()
 		{
 			$sorting = $this->enableSorting;
