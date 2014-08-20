@@ -83,9 +83,10 @@
 						$row[$name] = $this->removeOuterTag(ob_get_clean());
 					}
                 }
+					
+				$metaRow = [];
 				if ($this->addMetaData !== false)
 				{
-					$metaRow = [];
 					if (is_callable([$r, 'getKeyString']))
 					{
 						$metaRow['data-key'] = call_user_func([$r, 'getKeyString']);
@@ -94,19 +95,17 @@
 					{
 						foreach ($this->addMetaData as $field)
 						{
-							if (is_object($r))
-							{
-								$row[$field] = $r->$field;
-							}
-							elseif (is_array($r))
-							{
-								$row[$field] = $r[$field];
-							}
+							$metaRow["data-$field"] = \CHtml::value($r, $field);
 						}
 					}
-					$row['metaData'] = $metaRow;
 				}
-                $data[] = $row;
+
+				if (isset($this->rowCssClassExpression))
+				{
+					$metaRow['class'] = $this->evaluateExpression($this->rowCssClassExpression,array('row'=> $i,'data'=> $r));
+				}
+				$row['metaData'] = $metaRow;
+				$data[] = $row;
             }
 			$this->dataProvider->setPagination($paginator);
 			return $data;
