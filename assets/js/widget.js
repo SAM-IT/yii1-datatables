@@ -223,7 +223,7 @@ $.fn.dataTableExt.oApi.fnExportData = function (oSettings, fileName)
 	var quote = '"';
 	var nl = "\n";
 	var escape = function(str) {
-		return quote + str + quote + delim;
+		return quote + $('<div/>').html(str).text().replace(/[\\"']/g, '"$&') + quote + delim;
 	}
 
 	for (var i in oSettings.aoColumns)
