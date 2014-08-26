@@ -29,7 +29,12 @@ Befound.ready(function() {
 	$(document).on('delete.' + ns, function(event, model, data) {
 		var selector = 'table.dataTable[data-model=' + model + '][data-listen]';
 		$(selector).each(function() {
-			$(this).dataTable().api().row('[data-key=' + data.id + ']').remove().draw();
+			var row = $(this).dataTable().api().row('[data-key="' + data.id + '"]')
+			var $row = $(row.node());
+			row.remove();
+			$row.fadeOut(400, function() {
+				row.draw();
+			})
 		})
 
 	});
