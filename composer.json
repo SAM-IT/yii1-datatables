@@ -1,0 +1,15 @@
+{
+	"name": "befound/yii-datables",
+    "description": "Yii widget wrapper for DataTables",
+    "license": "MIT",
+	"minimum-stability" : "dev",
+    "authors": [
+        {
+		    "name": "Sam Mousa",
+            "email": "sam@befound.nl"
+        }
+    ],
+	"require" : {
+		"components/datatables": "*"
+	}
+}
