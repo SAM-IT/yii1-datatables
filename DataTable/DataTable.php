@@ -73,7 +73,7 @@
 					$name = $this->getColumnName($column);
                     ob_start();
 					$column->renderDataCell($i);
-					
+
 					if (property_exists($column, 'type') && $column->type == 'number')
 					{
 						$row[$name] = (int) $this->removeOuterTag(ob_get_clean());
@@ -83,7 +83,7 @@
 						$row[$name] = $this->removeOuterTag(ob_get_clean());
 					}
                 }
-					
+
 				$metaRow = [];
 				if ($this->addMetaData !== false)
 				{
@@ -260,7 +260,7 @@
 				}
 				elseif ($column instanceof \CLinkColumn)
 				{
-					$columnConfig['type'] = 'html'; 
+					$columnConfig['type'] = 'html';
 				}
 				elseif ($column instanceof \CCheckBoxColumn)
 				{
@@ -286,7 +286,7 @@
 				{
 					$columnConfig['className'] = $column->htmlOptions['class'];
 				}
-				
+
 				// Set filter.
 				if (isset($column->filter))
 				{
@@ -307,12 +307,13 @@
 
         public function registerClientScript()
 		{
-			$url = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/../assets', false, -1, YII_DEBUG);
+			$url = \ComponentInstaller\Includer::getUrl('datatables') . '/media';
+			$url2 = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/../assets', false, -1, YII_DEBUG);
 			$cs = Yii::app()->clientScript;
             $cs->registerPackage('jquery');
 			if (defined('YII_DEBUG') && YII_DEBUG)
             {
-                $cs->registerScriptFile($url . '/js/jquery.dataTables.js', $cs::POS_END);
+				$cs->registerScriptFile($url . '/js/jquery.dataTables.js', $cs::POS_END);
 				$cs->registerCssFile($url . '/css/jquery.dataTables.css');
             }
             else
@@ -320,11 +321,11 @@
                 $cs->registerScriptFile($url . '/js/jquery.dataTables.min.js', $cs::POS_END);
 				$cs->registerCssFile($url . '/css/jquery.dataTables.min.css');
             }
-			
-			$cs->registerCssFile($url . '/css/overrides.css');
-			$cs->registerScriptFile($url . '/js/widget.js', $cs::POS_END);
+
+			$cs->registerCssFile($url2 . '/overrides.css');
+			$cs->registerScriptFile($url2 . '/widget.js', $cs::POS_END);
 			if (isset(Yii::app()->Befound)) {
-				$cs->registerScriptFile($url . '/js/befound.js', $cs::POS_END);
+				$cs->registerScriptFile($url2 . '/befound.js', $cs::POS_END);
 			}
         }
 
@@ -431,7 +432,7 @@
 			$data = $this->dataProvider->data[$row];
 			if($this->rowHtmlOptionsExpression!==null)
 			{
-				
+
 				$options=$this->evaluateExpression($this->rowHtmlOptionsExpression,array('row'=>$row,'data'=>$data));
 				if(is_array($options))
 					$htmlOptions = $options;
@@ -499,7 +500,7 @@
 			{
             	parent::run();
 			}
-            
+
         }
 
 		protected function removeOuterTag($str)
@@ -516,5 +517,5 @@
 
 
 }
-    
+
 ?>
