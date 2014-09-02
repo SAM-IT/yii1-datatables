@@ -1,5 +1,6 @@
 {
-	"name": "befound/yii-datables",
+	"name": "befound/yii-datatables",
+	"type": "library",
     "description": "Yii widget wrapper for DataTables",
     "license": "MIT",
 	"minimum-stability" : "dev",
