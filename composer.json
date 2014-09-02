@@ -11,6 +11,12 @@
         }
     ],
 	"require" : {
+		"php" : ">=5.4.0",
 		"components/datatables": "*"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"DataTable\\" : "DataTable/"
+		}
 	}
 }
