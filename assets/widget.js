@@ -182,7 +182,7 @@ $(document).ready(function() {
 	 */
 	$.fn.dataTableExt.oApi.fnAddMetaData = function (oSettings, nRow, aData)
 	{
-		if (typeof aData.metaData == 'object')
+		if ($.isPlainObject(aData.metaData))
 		{
 			$(nRow).attr(aData.metaData);
 		}
