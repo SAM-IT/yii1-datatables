@@ -154,7 +154,8 @@ $(document).ready(function() {
 						// They are already sorted.
 						if (index == 0 || arr[index-1] != value)
 						{
-							$('<option>').attr('value', value).html(value).appendTo(select);
+							var $tag = $('<option>').html(value).appendTo(select);
+                            $tag.attr('value', $tag.text());
 						}
 					});
 				}
@@ -162,7 +163,9 @@ $(document).ready(function() {
 				{
 					api.columns(i).data().eq(0).sort().unique().each(function(item)
 					{
-						$('<option>').attr('value', item).html(item).appendTo(select);
+                        var $tag = $('<option>').html(item).appendTo(select);
+                        $tag.attr('value', $tag.text());
+						
 					});
 				}
 				select.trigger('change');
