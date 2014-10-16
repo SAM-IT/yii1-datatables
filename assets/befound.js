@@ -9,14 +9,14 @@ Befound.ready(function() {
 			$(this).dataTable().api().ajax.url(Befound.App.createUrl($(this).data('route'), {'id' : id})).load();
 		})
 	});
-	$(document).on('update.' + ns + ' create.' + ns + ' delete.' + ns, function(event, model, data) {
+	$(document).on('update.' + ns + ' create.' + ns, function(event, model, data) {
 		var selector = 'table.dataTable[data-model=' + model + '][data-route][data-listen]';
 		$(selector).each(function() {
 			// Get id.
 			var field = $(this).data('basemodel').toLowerCase() + '_id';
-			if (typeof data.attributes[field] != 'undefined')
+			if (typeof data.elements[field] != 'undefined')
 			{
-				$(this).dataTable().api().ajax.url(Befound.App.createUrl($(this).data('route'), {'id' : data.attributes[field]})).load();
+				$(this).dataTable().api().ajax.url(Befound.App.createUrl($(this).data('route'), {'id' : data.elements[field].value})).load();
 			}
 			else
 			{
