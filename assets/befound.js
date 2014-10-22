@@ -29,7 +29,16 @@ Befound.ready(function() {
 	$(document).on('delete.' + ns, function(event, model, data) {
 		var selector = 'table.dataTable[data-model=' + model + '][data-listen]';
 		$(selector).each(function() {
-			$(this).dataTable().api().row('[data-key=' + data.id + ']').remove().draw();
+            if (typeof data.id == 'object') {
+                var key = [];
+                for (var field in data.id) {
+                    key.push(data.id[field]);
+                }
+                $(this).dataTable().api().row('[data-key="' + key.join(".") + '"]').remove().draw();
+            } else {
+                $(this).dataTable().api().row('[data-key="' + data.id + '"]').remove().draw();
+            }
+			
 		})
 
 	});
