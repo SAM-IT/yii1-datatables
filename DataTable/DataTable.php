@@ -61,29 +61,32 @@
 
 		protected function createDataArray()
 		{
+			\Yii::beginProfile('createDataArray');
 			$data = array();
 
 			$paginator = $this->dataProvider->getPagination();
 			$this->dataProvider->setPagination(false);
-			foreach ($this->dataProvider->getData(true) as $i => $r)
+			Yii::beginProfile('getData');
+			$source = $this->dataProvider->getData(true);
+			Yii::endProfile('getData');
+			Yii::beginProfile('renderCells');
+			foreach ($source as $i => $r)
             {
                 $row = [];
                 foreach ($this->columns as $column)
                 {
 					$name = $this->getColumnName($column);
-                    ob_start();
-					$column->renderDataCell($i);
-					
-					if (property_exists($column, 'type') && $column->type == 'number')
-					{
-						$row[$name] = (int) $this->removeOuterTag(ob_get_clean());
-					}
-					else
-					{
-						$row[$name] = $this->removeOuterTag(ob_get_clean());
-					}
+					$row[$name] = $column->getDataCellContent($i);
+//					if (property_exists($column, 'type') && $column->type == 'number')
+//					{
+//						$row[$name] = (int) $column->getDataCellContent($i);
+//					}
+//					else
+//					{
+//						$row[$name] = $column->getDataCellContent($i);
+//					}
                 }
-					
+
 				$metaRow = [];
 				if ($this->addMetaData !== false)
 				{
@@ -99,15 +102,15 @@
 						}
 					}
 				}
-
-				if (isset($this->rowCssClassExpression))
-				{
+				if (isset($this->rowCssClassExpression)) {
 					$metaRow['class'] = $this->evaluateExpression($this->rowCssClassExpression,array('row'=> $i,'data'=> $r));
 				}
 				$row['metaData'] = $metaRow;
 				$data[] = $row;
             }
+			Yii::endProfile('renderCells');
 			$this->dataProvider->setPagination($paginator);
+			\Yii::endProfile('createDataArray');
 			return $data;
 		}
 
@@ -151,6 +154,7 @@
 			if(!isset($this->htmlOptions['class']))
 				$this->htmlOptions['class']='datatable-view';
 
+			$this->dataProvider->setData([]);
             parent::init();
 			if ($this->selectableRows == 1)
 			{
@@ -504,13 +508,23 @@
 
 		protected function removeOuterTag($str)
 		{
+			Yii::beginProfile('removeOuterTag');
 			$regex = '/<.*?>(.*)<\/.*?>/s';
-			$matches = array();
-			if (preg_match($regex, $str, $matches))
-			{
-				return $matches[1];
+			$matches = [];
+
+			if (strncmp($str, '<td>', 4) == 0) {
+				$result = substr($str, 4, -5);
+			} else {
+				throw new \Exception("Unknown format: $str");
 			}
-			return $str;
+
+//			elseif (preg_match($regex, $str, $matches)) {
+//				$result = $matches[1];
+//			} else {
+//				$result = $str;
+//			}
+			Yii::endProfile('removeOuterTag');
+			return $result;
 		}
 
 
