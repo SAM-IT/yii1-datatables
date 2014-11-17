@@ -102,17 +102,23 @@ $(document).ready(function() {
 	});
 });
 	$('body').on('processing.dt', 'table.dataTable', function(e, settings, processing) {
-		if (processing)
-		{
-			$(this).parent().parent().parent().trigger('startLoading');
-		}
-		else
-		{
-			$(this).parent().parent().parent().trigger('endLoading');
+		if (processing) {
+            $(this).parent().parent().parent().trigger('startLoading');
+		} else {
+            $(this).parent().parent().parent().trigger('endLoading');
 		}
 	});
 
 	$('body').on('xhr.dt', 'table.dataTable', function(e, settings, json) {
+        if (typeof json.scripts != 'undefined') {
+            var scripts = json.scripts;
+            var func = function($) { 
+                var jQuery = $;
+                eval(scripts);
+            };
+            delete json['scripts'];
+            settings.oInstance.one('draw.dt', function(e, settings) { func(settings.oInstance.api().$); });
+        }
 		$.fn.dataTableExt.oApi.fnUpdateFilters.call(this, settings, json);
 	});
 

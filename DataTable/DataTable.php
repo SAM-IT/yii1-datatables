@@ -24,7 +24,11 @@
          */
         public $columns = array();
         public $itemsCssClass = 'display';
-//        public $pageSize = 10;
+        
+        /**
+         *
+         * @var string[]
+         */
 		public $onInit = [];
 
 		public $pageSizeOptions = [];
@@ -146,8 +150,7 @@
 			if(!isset($this->htmlOptions['class']))
 				$this->htmlOptions['class']='datatable-view';
 
-			$this->dataProvider->setData([]);
-            parent::init();
+			parent::init();
 			if ($this->selectableRows == 1)
 			{
 				$this->itemsCssClass .= ' singleSelect';
@@ -290,14 +293,6 @@
 				}
 				$this->config["columns"][] = $columnConfig;
 
-				/**
-				 * This will force us to render an HTML table instead of passing
-				 * the items directly as json data.
-				 */
-				if (isset($column->hasScript))
-				{
-					$this->gracefulDegradation = true;
-				}
             }
         }
 
@@ -331,19 +326,50 @@
          */
         protected function renderData()
         {
-            $this->config['data'] = $this->createDataArray();
-			if (isset($this->config["ajax"]))
+            // Copy all registered scripts.
+            $cs = Yii::app()->clientScript;
+            if (isset($cs->scripts[$cs::POS_READY])) {
+                $scripts =  $cs->scripts[$cs::POS_READY];
+                $cs->scripts[$cs::POS_READY] = [];
+            }
+            
+            $config = $this->config;
+            
+            // Render data
+            $config['data'] = $this->createDataArray();
+            
+            // Started empty, now we have scripts.
+            if (!isset($scripts) && isset($cs->scripts[$cs::POS_READY])) {
+                $tableScripts = $cs->scripts[$cs::POS_READY];
+            // Started with scripts and we have new ones.
+            } elseif (isset($cs->scripts[$cs::POS_READY])) {
+                // Compare newly registered scripts to see which one are data related.
+                $tableScripts = implode("\n", array_diff_key($cs->scripts[$cs::POS_READY], $scripts));
+            } 
+            
+            if (isset($scripts)) {
+                // Restore original scripts.
+                $cs->scripts[$cs::POS_READY] = $scripts;
+            }
+            if (isset($tableScripts)) {
+                $this->onInit[] = "(function ($) { $tableScripts })(settings.oInstance.api().$);";
+            }
+//            $script = "$('#{$this->getId()}').one('draw.dt', function(e, settings) { (function ($) { $tableScripts })(settings.oInstance.api().$); });";
+//            $cs->registerScript($this->getId() . 'scripts', $script);
+            
+			
+			if (isset($config["ajax"]))
 			{
 //				$this->config["deferLoading"] = $this->dataProvider->getTotalItemCount();
 //				$this->config["serverSide"] = true;
 			}
 			if (!empty($this->onInit))
 			{
-				$this->config['initComplete'] = new CJavaScriptExpression("function (settings, json) {\n" . implode("\n", $this->onInit) . "\n}");
+				$config['initComplete'] = new CJavaScriptExpression("function (settings, json) {\n" . implode("\n", $this->onInit) . "\n}");
 			}
-			$this->config['ordering'] = $this->enableSorting;
-
-			Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " table').dataTable(" . \CJavaScript::encode($this->config) . "));", \CClientScript::POS_READY);
+			$config['ordering'] = $this->enableSorting;
+            
+            Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " table').dataTable(" . \CJavaScript::encode($config) . "));", \CClientScript::POS_READY);
         }
 
 		public function renderFilter()
@@ -398,14 +424,11 @@
 			echo CHtml::openTag('table', $options);
 			$this->renderTableHeader();
 
-			if (!$this->gracefulDegradation)
-            {
-				$this->renderData();
-            }
-			else
-			{
-				$this->renderTableBody();
-//				throw new Exception('Graceful degration not yet supported.');
+			if (!$this->gracefulDegradation) {
+                $this->renderData();
+            } else {
+                $this->renderTableBody();
+                $cs->registerScript($this->getId() . 'init', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " table').dataTable(" . \CJavaScript::encode($this->config) . "));", \CClientScript::POS_READY);
 			}
 			echo CHtml::closeTag('table');
 
@@ -484,17 +507,19 @@
 			$this->enableSorting = $sorting;
 		}
         public function run() {
-			if (Yii::app()->getRequest()->getIsAjaxRequest())
-			{
+            /** @var \CClientScript; */
+            $cs = Yii::app()->clientscript;
+			if (Yii::app()->getRequest()->getIsAjaxRequest()) {
 				$result = ['data' => $this->createDataArray()];
 				$result['iTotalRecords'] = count($result['data']);
 				$result['iTotalDisplayRecords'] = count($result['data']);
-				header("Content-Type: application/json");
-				echo json_encode($result);
-			}
-			else
-			{
-            	parent::run();
+                if (isset($cs->scripts[$cs::POS_READY])) {
+                    $result['scripts'] = implode(" ", $cs->scripts[$cs::POS_READY]);
+                }
+                header("Content-Type: application/json");
+				echo json_encode($result, JSON_PRETTY_PRINT);
+			} else {
+                parent::run();
 			}
 
         }
