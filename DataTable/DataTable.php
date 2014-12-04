@@ -247,7 +247,7 @@
 					switch ($column->type)
 					{
 						case 'number':
-							$columnConfig['type'] = 'numeric';
+							$columnConfig['type'] = 'num';
 							break;
 						case 'datetime':
 						case 'date':
