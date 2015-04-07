@@ -1,6 +1,6 @@
 <?php
 	namespace DataTable;
-	use \Yii, \CHtml, \CJavaScriptExpression;
+	use \Yii, \TbHtml, \CJavaScriptExpression;
 
 	class DataTable extends \CGridView
     {
@@ -94,7 +94,7 @@
 					{
 						foreach ($this->addMetaData as $field)
 						{
-							$metaRow["data-$field"] = \CHtml::value($r, $field);
+							$metaRow["data-$field"] = TbHtml::value($r, $field);
 						}
 					}
 				}
@@ -371,7 +371,7 @@
             
             Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " table').dataTable(" . \CJavaScript::encode($config) . "));", \CClientScript::POS_READY);
         }
-
+//
 		public function renderFilter()
 		{
 			if($this->filter!==null)
@@ -382,19 +382,19 @@
 					echo "<th>";
 					if (isset($column->filter) && $column->filter === 'select')
 					{
-						echo CHtml::dropDownList('filter', null, [], ['id' => "filter_" . $column->id]);
+						echo TbHtml::dropDownList('filter', null, [], ['id' => "filter_" . $column->id, 'class' => 'form-control']);
 					}
 					elseif (isset($column->filter) && $column->filter === 'select2')
 					{
 						$this->widget(\Befound\Widgets\Select2::CLASS, [
-							'htmlOptions' => ['id' => "filter_" . $column->id],
+							'htmlOptions' => ['id' => "filter_" . $column->id, 'class' => 'form-control'],
 							'name' => $column->name,
 							'items' => []
 						]);
 					}
 					elseif (property_exists($column, 'filter') &&  $column->filter !== false)
 					{
-						echo CHtml::textField('filter');
+						echo TbHtml::textField('filter');
 					}
 					echo "</th>";
 
@@ -421,7 +421,7 @@
 			{
 				$options['data-listen'] = $this->listen;
 			}
-			echo CHtml::openTag('table', $options);
+			echo TbHtml::openTag('table', $options);
 			$this->renderTableHeader();
 
 			if (!$this->gracefulDegradation) {
@@ -430,7 +430,7 @@
                 $this->renderTableBody();
                 $cs->registerScript($this->getId() . 'init', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " table').dataTable(" . \CJavaScript::encode($this->config) . "));", \CClientScript::POS_READY);
 			}
-			echo CHtml::closeTag('table');
+			echo TbHtml::closeTag('table');
 
         }
 
@@ -494,7 +494,7 @@
 					}
 				}
 			}
-			echo CHtml::openTag('tr', $htmlOptions)."\n";
+			echo TbHtml::openTag('tr', $htmlOptions)."\n";
 			foreach($this->columns as $column)
 				$column->renderDataCell($row);
 			echo "</tr>\n";

@@ -4,8 +4,8 @@
 
 	class CheckBoxList extends \CInputWidget
 	{
-                //placeholder constant to use as column
-                const CHECKBOX_COLUMN = '{CHECKBOX_COLUMN}';
+        //placeholder constant to use as column
+        const CHECKBOX_COLUMN = '{CHECKBOX_COLUMN}';
 		public $checkBoxColumn;
 		public $options;
 		public $errorOptions;
@@ -49,23 +49,21 @@
 			{
 				$this->htmlOptions['name'] .= '[]';
 			}
-
 			$this->checkBoxColumn['checkBoxHtmlOptions']['name'] = $this->htmlOptions['name'];
-                        
-                        //search for placeholder const in the columns
-                        $foundplaceholder = false;
-                        foreach( $this->options['columns'] as $key => $column){
-                            if($column == static::CHECKBOX_COLUMN){
-                                $this->options['columns'][$key] = $this->checkBoxColumn;
-                                $foundplaceholder = true;
-                                break;
-                            }
-                        }
-                        //if not found, choose the last column
-                        if(!$foundplaceholder)
-                        {
-                            $this->options['columns'][] = $this->checkBoxColumn;
-                        }
+            //search for placeholder const in the columns
+            $foundplaceholder = false;
+            foreach( $this->options['columns'] as $key => $column){
+                if($column == static::CHECKBOX_COLUMN){
+                    $this->options['columns'][$key] = $this->checkBoxColumn;
+                    $foundplaceholder = true;
+                    break;
+                }
+            }
+            //if not found, choose the last column
+            if(!$foundplaceholder)
+            {
+                $this->options['columns'][] = $this->checkBoxColumn;
+            }
 			if (!isset($this->options['id']))
 			{
 				$this->options['id'] = $this->resolveNameID()[1];
