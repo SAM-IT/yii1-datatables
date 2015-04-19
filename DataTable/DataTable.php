@@ -298,7 +298,7 @@
 
         public function registerClientScript()
 		{
-			$url = \ComponentInstaller\Includer::getUrl('datatables') . '/media';
+            $url = \Yii::app()->params['bower-asset'] . '/media';
 			$url2 = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/../assets', false, -1, YII_DEBUG);
 			$cs = Yii::app()->clientScript;
             $cs->registerPackage('jquery');
