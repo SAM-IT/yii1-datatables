@@ -5,6 +5,13 @@
 	class DataTable extends \CGridView
     {
 
+        protected $pluginFiles = [
+            'datetime-moment' => [
+                '/moment/min/moment-with-locales.min.js',
+                '/drmonty-datatables-plugins/sorting/datetime-moment.js'
+            ]
+        ];
+
 		/**
 		 * If set, datatable will refresh on select event.
 		 * @var string Name of the model the data in this table depends on.
@@ -63,6 +70,10 @@
 		 */
 		public $addMetaData = true;
 
+
+        public $plugins = [
+            'datetime-moment'
+        ];
 		protected function createDataArray()
 		{
 			\Yii::beginProfile('createDataArray');
@@ -242,6 +253,11 @@
 				);
 
 				$columnConfig['data'] = $this->getColumnName($column);
+//                if ($this->formatter instanceof \CLocalizedFormatter) {
+//                    var_dump($this->formatter->getLocale()->getDateFormat($this->formatter->dateFormat));
+//                    die();
+//                }
+                /* @var \CDataColumn $column */
 				if ($column instanceof \CDataColumn)
 				{
 					switch ($column->type)
@@ -250,8 +266,14 @@
 							$columnConfig['type'] = 'num';
 							break;
 						case 'datetime':
+//                            $columnConfig['type'] = 'moment';
+//                            var_dump($this->getFormatter()); die();
+                            break;
 						case 'date':
-							$columnConfig['type'] = 'date';
+//                            var_dump($this->getFormatter()->dateFormat);
+//                            var_dump($this->getFormatter()->);
+//                            die();
+//							$columnConfig['type'] = 'moment';
 							break;
 						default:
 							$columnConfig['type'] = 'html';
@@ -300,6 +322,7 @@
 		{
             $url = \Yii::app()->params['bower-asset'] . '/datatables/media';
 			$url2 = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/../assets', false, -1, YII_DEBUG);
+            /** @var \CClientScript $cs */
 			$cs = Yii::app()->clientScript;
             $cs->registerPackage('jquery');
 			if (defined('YII_DEBUG') && YII_DEBUG)
@@ -318,6 +341,30 @@
 			if (isset(Yii::app()->Befound)) {
 				$cs->registerScriptFile($url2 . '/befound.js', $cs::POS_END);
 			}
+
+            foreach($this->plugins as $plugin) {
+                foreach($this->pluginFiles[$plugin] as $file) {
+//                    die(\Yii::app()->params['bower-asset'] . $file);
+
+                    $cs->registerScriptFile(\Yii::app()->params['bower-asset'] . $file, $cs::POS_END);
+                }
+            }
+
+            // Register locale.
+            $language = \Yii::app()->language;
+            $cs->registerScript('datatables-locale', "moment.locale('$language');");
+            // Register format.
+            if ($this->formatter instanceof \CLocalizedFormatter) {
+                $format = $this->formatter->locale->getDateFormat($this->formatter->dateFormat);
+            } else {
+                $format = $this->formatter->dateFormat;
+            }
+
+            $format = strtr($format, [
+                'dd' => 'DD',
+                'y' => 'YYYY'
+            ]);
+            $cs->registerScript('datatables-dateformat', "$.fn.dataTable.moment('$format');");
         }
 
 
@@ -428,7 +475,7 @@
                 $this->renderData();
             } else {
                 $this->renderTableBody();
-                $cs->registerScript($this->getId() . 'init', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " table').dataTable(" . \CJavaScript::encode($this->config) . "));", \CClientScript::POS_READY);
+                \Yii::app()->clientScript->registerScript($this->getId() . 'init', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " table').dataTable(" . \CJavaScript::encode($this->config) . "));", \CClientScript::POS_READY);
 			}
 			echo TbHtml::closeTag('table');
 
