@@ -361,6 +361,7 @@
             }
 
             $format = strtr($format, [
+                'd' => 'D',
                 'dd' => 'DD',
                 'y' => 'YYYY'
             ]);
