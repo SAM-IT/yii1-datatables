@@ -432,6 +432,9 @@
 					{
 						echo TbHtml::dropDownList('filter', null, [], ['id' => "filter_" . $column->id, 'class' => 'form-control']);
 					}
+					elseif (isset($column->filter) && $column->filter === 'select-strict') {
+						echo TbHtml::dropDownList('filter', null, [], ['id' => "filter_" . $column->id, 'class' => 'form-control strict']);
+					}
 					elseif (isset($column->filter) && $column->filter === 'select2')
 					{
 						$this->widget(\Befound\Widgets\Select2::CLASS, [

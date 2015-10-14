@@ -72,16 +72,12 @@ $(document).ready(function() {
 		$(this).closest('table').dataTable().fnFilter($(this).val(), $(this).parent().index());
 	});
 	
-	$('body').on('change', 'table.dataTable tr.filters select', function(e) {
-		// We need exact match.
-//		if ($(this).val() == "")
-//		{
-			$(this).closest('table').dataTable().api().columns($(this).parent().index()).search($(this).val(), false, true).draw();
-//		}
-//		else
-//		{
-//			$(this).closest('table').dataTable().api().columns($(this).parent().index()).search("^"  + $(this).val() + "$", true, false).draw();
-//		}
+	$('body').on('change', 'table.dataTable tr.filters select:not(.strict)', function(e) {
+		$(this).closest('table').dataTable().api().columns($(this).parent().index()).search($(this).val(), false, true).draw();
+	});
+
+	$('body').on('change', 'table.dataTable tr.filters select.strict', function(e) {
+		$(this).closest('table').dataTable().api().columns($(this).parent().index()).search("^"  + $(this).val() + "$", true, false).draw();
 	});
 
 	$('body').on('init.dt', 'table.dataTable', function(e, settings, json) {
@@ -136,7 +132,7 @@ $(document).ready(function() {
 	 * Function: fnUpdateFilters
 	 * Purpose:  Updates the dropdown filters.
 	 * Returns:  null
-	 * Inputs:   object: oSettings - dataTable settings object. This is always the last argument past to the function
+	 * Inputs:   object: oSettings - dataTable settings object. This is always the last argument passed to the function
 	 *           json: The json data that was loaded.
 	 * Author:   Sam Mousa (sam@befound.nl);
 	 */
@@ -150,8 +146,7 @@ $(document).ready(function() {
 			{
 				var select = $('tr.filters th:nth(' + i + ') select')
 				select.find('option').remove();
-
-				select.append('<option value="">' + settings.oLanguage.filter.none + '</option>');
+                select.append('<option value="">' + settings.oLanguage.filter.none + '</option>');
 				if (typeof json != 'undefined')
 				{
 					json.data.map(function (currentValue, index) {
