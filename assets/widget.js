@@ -77,7 +77,11 @@ $(document).ready(function() {
 	});
 
 	$('body').on('change', 'table.dataTable tr.filters select.strict', function(e) {
-		$(this).closest('table').dataTable().api().columns($(this).parent().index()).search("^"  + $(this).val() + "$", true, false).draw();
+		if ($(this).val() == "") {
+			$(this).closest('table').dataTable().api().columns($(this).parent().index()).search("", false, false).draw();
+		} else {
+			$(this).closest('table').dataTable().api().columns($(this).parent().index()).search("^" + $(this).val() + "$", true, false).draw();
+		}
 	});
 
 	$('body').on('init.dt', 'table.dataTable', function(e, settings, json) {
