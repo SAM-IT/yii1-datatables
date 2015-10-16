@@ -80,7 +80,7 @@ $(document).ready(function() {
 		if ($(this).val() == "") {
 			$(this).closest('table').dataTable().api().columns($(this).parent().index()).search("", false, false).draw();
 		} else {
-			$(this).closest('table').dataTable().api().columns($(this).parent().index()).search("^" + $(this).val() + "$", true, false).draw();
+			$(this).closest('table').dataTable().api().columns($(this).parent().index()).search("^" + $(this).val().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&") + "$", true, false).draw();
 		}
 	});
 
