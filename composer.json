@@ -1,5 +1,5 @@
 {
-	"name": "befound/yii-datatables",
+	"name": "sam-it/yii-datatables",
 	"type": "library",
     "description": "Yii widget wrapper for DataTables",
     "license": "MIT",
@@ -7,7 +7,7 @@
     "authors": [
         {
 		    "name": "Sam Mousa",
-            "email": "sam@befound.nl"
+            "email": "sam@mousa.nl"
         }
     ],
 	"require" : {
@@ -18,7 +18,7 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"DataTable\\" : "DataTable/"
+			"SamIT\Yii1\DataTables\\" : "src/"
 		}
 	}
 }
