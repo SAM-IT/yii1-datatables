@@ -1,5 +1,5 @@
 <?php
-	namespace DataTable;
+	namespace SamIT\Yii1\DataTables;
 	use \Yii, \TbHtml, \CJavaScriptExpression;
 
 	class DataTable extends \CGridView
