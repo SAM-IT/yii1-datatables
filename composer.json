@@ -1,5 +1,5 @@
 {
-	"name": "sam-it/yii-datatables",
+	"name": "sam-it/yii1-datatables",
 	"type": "library",
     "description": "Yii widget wrapper for DataTables",
     "license": "MIT",

@@ -1,6 +1,6 @@
 <?php
-	namespace DataTable;
-	use \Yii, \TbHtml, \CJavaScriptExpression;
+	namespace SamIT\Yii1\DataTables;
+	use \Yii, \CJavaScriptExpression;
 
 	class DataTable extends \CGridView
     {
@@ -105,7 +105,7 @@
 					{
 						foreach ($this->addMetaData as $field)
 						{
-							$metaRow["data-$field"] = TbHtml::value($r, $field);
+							$metaRow["data-$field"] = \CHtml::value($r, $field);
 						}
 					}
 				}
@@ -297,7 +297,7 @@
 				if (isset($column->htmlOptions['style']))
 				{
 					// Create custom class:
-					$class = __CLASS__ . md5(microtime());
+					$class = $this->getId() . md5(microtime());
 					$css = "td.$class {{$column->htmlOptions['style']}}";
 					App()->getClientScript()->registerCss($class, $css );
 					$column->htmlOptions['class'] = isset($column->htmlOptions['class']) ? $column->htmlOptions['class'] . ' ' . $class : $class;
@@ -430,10 +430,10 @@
 					echo "<th>";
 					if (isset($column->filter) && $column->filter === 'select')
 					{
-						echo TbHtml::dropDownList('filter', null, [], ['id' => "filter_" . $column->id, 'class' => 'form-control']);
+						echo \CHtml::dropDownList('filter', null, [], ['id' => "filter_" . $column->id, 'class' => 'form-control']);
 					}
 					elseif (isset($column->filter) && $column->filter === 'select-strict') {
-						echo TbHtml::dropDownList('filter', null, [], ['id' => "filter_" . $column->id, 'class' => 'form-control strict']);
+						echo \CHtml::dropDownList('filter', null, [], ['id' => "filter_" . $column->id, 'class' => 'form-control strict']);
 					}
 					elseif (isset($column->filter) && $column->filter === 'select2')
 					{
@@ -445,7 +445,7 @@
 					}
 					elseif (property_exists($column, 'filter') &&  $column->filter !== false)
 					{
-						echo TbHtml::textField('filter');
+						echo \CHtml::textField('filter', '', ['id' => "filter_" . $column->id, 'class' => 'form-control']);
 					}
 					echo "</th>";
 
@@ -472,7 +472,7 @@
 			{
 				$options['data-listen'] = $this->listen;
 			}
-			echo TbHtml::openTag('table', $options);
+			echo \CHtml::openTag('table', $options);
 			$this->renderTableHeader();
 
 			if (!$this->gracefulDegradation) {
@@ -481,7 +481,7 @@
                 $this->renderTableBody();
                 \Yii::app()->clientScript->registerScript($this->getId() . 'init', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " table').dataTable(" . \CJavaScript::encode($this->config) . "));", \CClientScript::POS_READY);
 			}
-			echo TbHtml::closeTag('table');
+			echo \CHtml::closeTag('table');
 
         }
 
@@ -545,7 +545,7 @@
 					}
 				}
 			}
-			echo TbHtml::openTag('tr', $htmlOptions)."\n";
+			echo \CHtml::openTag('tr', $htmlOptions)."\n";
 			foreach($this->columns as $column)
 				$column->renderDataCell($row);
 			echo "</tr>\n";
