@@ -47,6 +47,7 @@
         protected $config = array(
             'info' => true,
             "createdRow" => "js:function() { this.fnAddMetaData.apply(this, arguments); }",
+            'autoWidth' => false,
 			'processing' => false,
 			//"sAjaxSource" => null,
 			//'bJQueryUI' => true
