@@ -13,7 +13,7 @@
 	"require" : {
 		"php" : ">=5.4.0",
         "bower-asset/datatables" : "^1.10.0",
-        "bower-asset/moment": "^2.0",
+        "bower-asset/moment": "^2.1",
         "bower-asset/drmonty-datatables-plugins": "^1.0"
 	},
 	"autoload" : {
