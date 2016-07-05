@@ -29,7 +29,7 @@
          *
          * @var CGridColumn[]
          */
-        public $columns = array();
+        public $columns = [];
         public $itemsCssClass = 'display';
         
         /**
@@ -39,8 +39,9 @@
 		public $onInit = [];
 
 		public $pageSizeOptions = [];
-		/*
-		 * @var CActiveDataProvider
+
+		/**
+		 * @var \CActiveDataProvider $dataProvider
 		 */
 		public $dataProvider;
 
@@ -49,6 +50,8 @@
             "createdRow" => "js:function() { this.fnAddMetaData.apply(this, arguments); }",
             'autoWidth' => false,
 			'processing' => false,
+			"serverSide" => false,
+            "pagingType" => "full"
 			//"sAjaxSource" => null,
 			//'bJQueryUI' => true
 
@@ -78,26 +81,36 @@
 		protected function createDataArray()
 		{
 			\Yii::beginProfile('createDataArray');
-			$data = array();
+			$data = [];
 
-			$paginator = $this->dataProvider->getPagination();
-			$this->dataProvider->setPagination(false);
 			Yii::beginProfile('getData');
-			$source = $this->dataProvider->getData(true);
-			Yii::endProfile('getData');
-			Yii::beginProfile('renderCells');
+            if (!$this->config['serverSide']) {
+                $paginator = $this->dataProvider->getPagination();
+                $this->dataProvider->setPagination(false);
+                $this->dataProvider->criteria->order = '';
+                $source = $this->dataProvider->getData(true);
+                $this->dataProvider->setPagination($paginator);
+            } else {
+                $source = $this->dataProvider->getData();
+            }
+
+            Yii::endProfile('getData');
+            Yii::beginProfile('renderCells');
+            // Get column name map.
+            $names = array_map([$this, 'getColumnName'], $this->columns);
 			foreach ($source as $i => $r)
             {
                 $row = [];
-                foreach ($this->columns as $column)
+                foreach ($this->columns as $j => $column)
                 {
-					$name = $this->getColumnName($column);
+					$name = $names[$j];
 					$row[$name] = $column->getDataCellContent($i);
                 }
 
 				$metaRow = [];
 				if ($this->addMetaData !== false)
 				{
+					Yii::beginProfile('addMetaData');
 					if (is_callable([$r, 'getKeyString']))
 					{
 						$metaRow['data-key'] = call_user_func([$r, 'getKeyString']);
@@ -109,6 +122,7 @@
 							$metaRow["data-$field"] = \CHtml::value($r, $field);
 						}
 					}
+                    Yii::endProfile('addMetaData');
 				}
 				if (isset($this->rowCssClassExpression)) {
 					$metaRow['class'] = $this->evaluateExpression($this->rowCssClassExpression,array('row'=> $i,'data'=> $r));
@@ -116,13 +130,12 @@
 				$row['metaData'] = $metaRow;
 				$data[] = $row;
             }
-			Yii::endProfile('renderCells');
-			$this->dataProvider->setPagination($paginator);
+			\Yii::endProfile('renderCells');
 			\Yii::endProfile('createDataArray');
 			return $data;
 		}
 
-		protected function getColumnName($column)
+		protected function getColumnName(\CGridColumn $column)
 		{
 			if (isset($column->name))
 			{
@@ -241,6 +254,8 @@
 			if (isset($this->ajaxUrl))
 			{
 				$this->config['ajax']['url'] = $this->ajaxUrl;
+                $this->config['processing'] = true;
+                $this->config['serverSide'] = true;
 			}
         }
 
@@ -249,11 +264,12 @@
             parent::initColumns();
 			foreach ($this->columns as $column)
             {
-				$columnConfig = array(
+				$columnConfig = [
                     'orderable' => $this->enableSorting && isset($column->sortable) && $column->sortable,
-				);
+				];
 
 				$columnConfig['data'] = $this->getColumnName($column);
+                $columnConfig['name'] = $this->getColumnName($column);
 //                if ($this->formatter instanceof \CLocalizedFormatter) {
 //                    var_dump($this->formatter->getLocale()->getDateFormat($this->formatter->dateFormat));
 //                    die();
@@ -558,22 +574,59 @@
 			parent::renderTableHeader();
 			$this->enableSorting = $sorting;
 		}
-        public function run() {
-            /** @var \CClientScript; */
-            $cs = Yii::app()->clientscript;
-			if (Yii::app()->getRequest()->getIsAjaxRequest()) {
-				$result = ['data' => $this->createDataArray()];
-				$result['iTotalRecords'] = count($result['data']);
-				$result['iTotalDisplayRecords'] = count($result['data']);
-                if (isset($cs->scripts[$cs::POS_READY])) {
-                    $result['scripts'] = implode(" ", $cs->scripts[$cs::POS_READY]);
-                }
-                header("Content-Type: application/json");
-				echo json_encode($result, JSON_PRETTY_PRINT);
+        public function run()
+        {
+            if (Yii::app()->getRequest()->getIsAjaxRequest()) {
+                $this->runAjax();
 			} else {
                 parent::run();
 			}
 
+        }
+
+        protected function runAjax()
+        {
+            /** @var \CClientScript; */
+            $cs = Yii::app()->clientscript;
+
+            $result = ['data' => $this->createDataArray()];
+            $result['recordsTotal'] = intval($this->dataProvider->getTotalItemCount());
+            $result['recordsFiltered'] = $this->filteredCount();
+            $result['draw'] = Yii::app()->request->getParam('draw');
+            if (isset($cs->scripts[$cs::POS_READY])) {
+                $result['scripts'] = implode(" ", $cs->scripts[$cs::POS_READY]);
+            }
+            
+            // Add filter values.
+            $model = $this->dataProvider->model;
+            $baseCriteria = $model->getDbCriteria();
+            $result['filterData'] = [];
+            /** @var \CDataColumn $column */
+            foreach($this->columns as $column) {
+                if (isset($column->filter) && strpos($column->filter, 'select') !== false) {
+                    $values = [];
+                    // Get all values for this column.
+                    $criteria = clone $this->dataProvider->countCriteria;
+                    $criteria->distinct = true;
+                    $criteria->select = $column->name;
+                    foreach($model->cache(120)->findAll($criteria) as $instance) {
+                        if (isset($column->value)) {
+                            $values[$instance->{$column->name}] = $column->evaluateExpression($column->value, ['data' => $instance, 'row' => -1]);
+                        } else {
+                            $values[$instance->{$column->name}] = $instance->{$column->name};
+                        }
+                    }
+
+                    asort($values);
+                    $result['filterData'][$column->name] = $values;
+                }
+            }
+
+            $model->setDbCriteria($baseCriteria);
+
+            
+            header("Content-Type: application/json");
+            echo json_encode($result, JSON_PRETTY_PRINT);
         }
 
 		protected function removeOuterTag($str)
@@ -597,6 +650,20 @@
 			return $result;
 		}
 
+
+        /**
+         * Calculates the total number of data items after filtering.
+         * @return integer the total number of data items.
+         */
+        protected function filteredCount()
+        {
+            $baseCriteria = $this->dataProvider->model->getDbCriteria(false);
+            if($baseCriteria!==null)
+                $baseCriteria=clone $baseCriteria;
+            $count = $this->dataProvider->model->count($this->dataProvider->criteria);
+            $this->dataProvider->model->setDbCriteria($baseCriteria);
+            return intval($count);
+        }
 
 
 }

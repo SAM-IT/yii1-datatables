@@ -69,6 +69,7 @@ $(document).ready(function() {
 	 * Filter hooks
 	 */
 	$('body').on('keyup', 'table.dataTable tr.filters input', function(e) {
+        cancelTime
 		$(this).closest('table').dataTable().fnFilter($(this).val(), $(this).parent().index());
 	});
 	
@@ -103,9 +104,9 @@ $(document).ready(function() {
 });
 	$('body').on('processing.dt', 'table.dataTable', function(e, settings, processing) {
 		if (processing) {
-            $(this).parent().parent().parent().trigger('startLoading');
+            // $(this).parent().parent().parent().trigger('startLoading');
 		} else {
-            $(this).parent().parent().parent().trigger('endLoading');
+            // $(this).parent().parent().parent().trigger('endLoading');
 		}
 	});
 
@@ -123,9 +124,9 @@ $(document).ready(function() {
 	});
 
 
-//		$(this).one('draw.dt', function() {
-//			$(this).trigger('dataload.dt', [settings, json]);
-//		});
+		// $(this).one('draw.dt', function() {
+		// 	$(this).trigger('dataload.dt');
+		// });
 	/*
 	 * Update filters
 	 */
@@ -149,20 +150,28 @@ $(document).ready(function() {
 			if (typeof column.sFilter == 'string' && column.sFilter.substr(0, 6) == 'select')
 			{
 				var select = $('tr.filters th:nth(' + i + ') select')
+                var originalValue = select.val();
 				select.find('option').remove();
                 select.append('<option value="">' + settings.oLanguage.filter.none + '</option>');
 				if (typeof json != 'undefined')
 				{
-					json.data.map(function (currentValue, index) {
-						return currentValue[column.data];
-					}).sort().forEach(function(value, index, arr) {
-						// They are already sorted.
-						if (index == 0 || arr[index-1] != value)
-						{
-							var $tag = $('<option>').html(value).appendTo(select);
-                            $tag.attr('value', $tag.text());
-						}
-					});
+                    if (typeof json.filterData != 'undefined'
+                        && typeof json.filterData[column.name] != 'undefined'
+                    ) {
+                        for (index in json.filterData[column.name]) {
+                            $('<option>').attr('value', index).html(json.filterData[column.name][index]).appendTo(select);
+                        }
+                    } else {
+                        json.data.map(function (currentValue, index) {
+                            return currentValue[column.data];
+                        }).sort().forEach(function (value, index, arr) {
+                            // They are already sorted.
+                            if (index == 0 || arr[index - 1] != value) {
+                                var $tag = $('<option>').html(value).appendTo(select);
+                                $tag.attr('value', $tag.text());
+                            }
+                        });
+                    }
 				}
 				else
 				{
@@ -173,7 +182,8 @@ $(document).ready(function() {
 						
 					});
 				}
-				select.trigger('change');
+                select.val(originalValue);
+				// select.trigger('change');
 			}
 		}
 
