@@ -4,7 +4,10 @@
 
 	class DataTable extends \CGridView
     {
-
+        /**
+         * @var bool Whether to include jquery-color. It is used for animating background colors of search fields.
+         */
+        public $useColor = true;
         protected $pluginFiles = [
             'datetime-moment' => [
                 '/moment/min/moment-with-locales.min.js',
@@ -254,8 +257,9 @@
 			if (isset($this->ajaxUrl))
 			{
 				$this->config['ajax']['url'] = $this->ajaxUrl;
-                $this->config['processing'] = true;
+//                $this->config['processing'] = true;
                 $this->config['serverSide'] = true;
+				$this->config['deferLoading'] = true;
 			}
         }
 
@@ -338,8 +342,7 @@
         public function registerClientScript()
 		{
             $url = \Yii::app()->params['bower-asset'] . '/datatables/media';
-			$url2 = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/../assets', false, -1, YII_DEBUG);
-            /** @var \CClientScript $cs */
+			/** @var \CClientScript $cs */
 			$cs = Yii::app()->clientScript;
             $cs->registerPackage('jquery');
 			if (defined('YII_DEBUG') && YII_DEBUG)
@@ -353,10 +356,17 @@
 				$cs->registerCssFile($url . '/css/jquery.dataTables.min.css');
             }
 
-			$cs->registerCssFile($url2 . '/overrides.css');
-			$cs->registerScriptFile($url2 . '/widget.js', $cs::POS_END);
+            // Jquery-color.
+            if ($this->useColor) {
+                $cs->registerScriptFile(\Yii::app()->params['bower-asset'] . '/jquery-color/jquery.color.js', $cs::POS_END);
+            }
+
+
+            $assetUrl = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/../assets', false, -1, YII_DEBUG);
+            $cs->registerCssFile($assetUrl . '/overrides.css');
+			$cs->registerScriptFile($assetUrl . '/widget.js', $cs::POS_END);
 			if (isset(Yii::app()->Befound)) {
-				$cs->registerScriptFile($url2 . '/befound.js', $cs::POS_END);
+				$cs->registerScriptFile($assetUrl . '/befound.js', $cs::POS_END);
 			}
 
             foreach($this->plugins as $plugin) {
@@ -401,7 +411,7 @@
             $config = $this->config;
             
             // Render data
-            $config['data'] = $this->createDataArray();
+            $config['data'] = $config['serverSide'] ? [] : $this->createDataArray();
             
             // Started empty, now we have scripts.
             if (!isset($scripts) && isset($cs->scripts[$cs::POS_READY])) {

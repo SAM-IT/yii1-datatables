@@ -69,8 +69,18 @@ $(document).ready(function() {
 	 * Filter hooks
 	 */
 	$('body').on('keyup', 'table.dataTable tr.filters input', function(e) {
-        cancelTime
-		$(this).closest('table').dataTable().fnFilter($(this).val(), $(this).parent().index());
+        if (typeof this.timer != undefined) {
+            clearTimeout(this.timer);
+		}
+        var $this = $(this);
+        $this.stop(true).css('background-color', '').animate({
+            backgroundColor: "#0088CC"
+        }, {
+            complete: function() { $this.css('background-color', ''); }
+        });
+        this.timer = setTimeout(function() {
+            $this.closest('table').dataTable().fnFilter($this.val(), $this.parent().index());
+        }, 500);
 	});
 	
 	$('body').on('change', 'table.dataTable tr.filters select:not(.strict)', function(e) {
@@ -103,10 +113,10 @@ $(document).ready(function() {
 	});
 });
 	$('body').on('processing.dt', 'table.dataTable', function(e, settings, processing) {
-		if (processing) {
-            // $(this).parent().parent().parent().trigger('startLoading');
+        if (processing) {
+            $(this).parents('.datatable-view').trigger('startLoading');
 		} else {
-            // $(this).parent().parent().parent().trigger('endLoading');
+            $(this).parents('.datatable-view').trigger('endLoading');
 		}
 	});
 

@@ -16,11 +16,11 @@ Befound.ready(function() {
 			var field = $(this).data('basemodel').toLowerCase() + '_id';
 			if (typeof data.elements[field] != 'undefined')
 			{
-				// $(this).dataTable().api().ajax.url(Befound.App.createUrl($(this).data('route'), {'id' : data.elements[field].value})).load();
+				$(this).dataTable().api().ajax.url(Befound.App.createUrl($(this).data('route'), {'id' : data.elements[field].value})).load();
 			}
 			else
 			{
-				// $(this).dataTable().api().ajax.reload();
+				$(this).dataTable().api().ajax.reload();
 			}
 		})
 
