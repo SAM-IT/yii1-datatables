@@ -113,15 +113,15 @@ $(document).ready(function() {
 	});
 });
 	$('body').on('processing.dt', 'table.dataTable', function(e, settings, processing) {
-        if (processing) {
-            $(this).parents('.datatable-view').trigger('startLoading');
-		} else {
-            $(this).parents('.datatable-view').trigger('endLoading');
-		}
+        if ($(this).data().processing !== processing) {
+            $(this).data().processing = processing;
+            $(this).parents('.datatable-view').trigger(processing ? 'startLoading' : 'endLoading');
+        }
+
 	});
 
 	$('body').on('xhr.dt', 'table.dataTable', function(e, settings, json) {
-        if (typeof json.scripts != 'undefined') {
+        if (json !== null && typeof json.scripts != 'undefined') {
             var scripts = json.scripts;
             var func = function($) { 
                 var jQuery = $;
@@ -163,7 +163,7 @@ $(document).ready(function() {
                 var originalValue = select.val();
 				select.find('option').remove();
                 select.append('<option value="">' + settings.oLanguage.filter.none + '</option>');
-				if (typeof json != 'undefined')
+				if (typeof json != 'undefined' && json !== null)
 				{
                     if (typeof json.filterData != 'undefined'
                         && typeof json.filterData[column.name] != 'undefined'
