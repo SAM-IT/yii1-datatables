@@ -168,8 +168,9 @@ $(document).ready(function() {
                     if (typeof json.filterData != 'undefined'
                         && typeof json.filterData[column.name] != 'undefined'
                     ) {
-                        for (index in json.filterData[column.name]) {
-                            $('<option>').attr('value', index).html(json.filterData[column.name][index]).appendTo(select);
+						for (var i = 0; i < json.filterData[column.name].length; i++) {
+                            var item = json.filterData[column.name][i];
+                            $('<option>').attr('value', item.key).html(item.value).appendTo(select);
                         }
                     } else {
                         json.data.map(function (currentValue, index) {

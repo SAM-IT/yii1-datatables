@@ -274,10 +274,6 @@
 
 				$columnConfig['data'] = $this->getColumnName($column);
                 $columnConfig['name'] = $this->getColumnName($column);
-//                if ($this->formatter instanceof \CLocalizedFormatter) {
-//                    var_dump($this->formatter->getLocale()->getDateFormat($this->formatter->dateFormat));
-//                    die();
-//                }
                 /* @var \CDataColumn $column */
 				if ($column instanceof \CDataColumn)
 				{
@@ -455,25 +451,29 @@
 				foreach($this->columns as $column)
 				{
 					echo "<th>";
-					if (isset($column->filter) && $column->filter === 'select')
-					{
-						echo \CHtml::dropDownList('filter', null, [], ['id' => "filter_" . $column->id, 'class' => 'form-control']);
-					}
-					elseif (isset($column->filter) && $column->filter === 'select-strict') {
-						echo \CHtml::dropDownList('filter', null, [], ['id' => "filter_" . $column->id, 'class' => 'form-control strict']);
-					}
-					elseif (isset($column->filter) && $column->filter === 'select2')
-					{
-						$this->widget(\Befound\Widgets\Select2::CLASS, [
-							'htmlOptions' => ['id' => "filter_" . $column->id, 'class' => 'form-control'],
-							'name' => $column->name,
-							'items' => []
-						]);
-					}
-					elseif (property_exists($column, 'filter') &&  $column->filter !== false)
-					{
-						echo \CHtml::textField('filter', '', ['id' => "filter_" . $column->id, 'class' => 'form-control']);
-					}
+                    if (property_exists($column, 'filter')) {
+                        switch($column->filter) {
+                            case 'select':
+                            case 'select-month':
+                                echo \CHtml::dropDownList('filter', null, [], ['id' => "filter_" . $column->id, 'class' => 'form-control']);
+                                break;
+                            case 'select-strict':
+                                echo \CHtml::dropDownList('filter', null, [], ['id' => "filter_" . $column->id, 'class' => 'form-control strict']);
+                                break;
+                            case 'select2':
+                                echo $this->widget(\Befound\Widgets\Select2::CLASS, [
+                                    'htmlOptions' => ['id' => "filter_" . $column->id, 'class' => 'form-control'],
+                                    'name' => $column->name,
+                                    'items' => []
+                                ], true);
+                                break;
+                            case false:
+                                // Since switch uses loose comparison we do a strict one manually..
+                                if ($column->filter === false) break;
+                            default:
+                                echo \CHtml::textField('filter', '', ['id' => "filter_" . $column->id, 'class' => 'form-control']);
+                        }
+                    }
 					echo "</th>";
 
 				}
@@ -613,22 +613,52 @@
             $result['filterData'] = [];
             /** @var \CDataColumn $column */
             foreach($this->columns as $column) {
-                if (isset($column->filter) && strpos($column->filter, 'select') !== false) {
-                    $values = [];
-                    // Get all values for this column.
-                    $criteria = clone $this->dataProvider->countCriteria;
-                    $criteria->distinct = true;
-                    $criteria->select = $column->name;
-                    foreach($model->cache(120)->findAll($criteria) as $instance) {
-                        if (isset($column->value)) {
-                            $values[$instance->{$column->name}] = $column->evaluateExpression($column->value, ['data' => $instance, 'row' => -1]);
-                        } else {
-                            $values[$instance->{$column->name}] = $instance->{$column->name};
-                        }
+                if (isset($column->filter)) {
+                    switch($column->filter) {
+                        case "select":
+                        case "select-strict":
+                            $values = [];
+                            // Get all values for this column.
+                            $criteria = clone $this->dataProvider->countCriteria;
+                            $criteria->distinct = true;
+                            $criteria->select = $column->name;
+                            foreach($model->cache(120)->findAll($criteria) as $instance) {
+                                $values[$instance->{$column->name}] = [
+                                    "key" => $instance->{$column->name},
+                                    "value" => isset($column->value)
+                                        ? $column->evaluateExpression($column->value,
+                                            ['data' => $instance, 'row' => -1])
+                                        : $instance->{$column->name}
+                                ];
+                            }
+                            usort($values, function($a, $b) { return strcasecmp($a['value'], $b['value']); });
+                            $result['filterData'][$column->name] = $values;
+                            break;
+                        case "select-month":
+                            $values = [];
+                            // Get all values for this column.
+                            $criteria = clone $this->dataProvider->countCriteria;
+                            $criteria->distinct = true;
+                            $criteria->select = $column->name;
+                            $criteria->limit = 500;
+//                              $command = App()->db->schema->commandBuilder->createFindCommand($model->tableName(), $criteria);
+//                            $values = $command->queryColumn();
+                            foreach($model->findAll($criteria) as $dateModel) {
+                                /** @var \DateTime $date */
+                                $date = $dateModel->{$column->name};
+                                $key = $date->format("Y-m");
+                                $values[$key] = [
+                                    "key" => $key,
+                                    "value" => \Yii::app()->dateFormatter->format("MMMM yyyy", $date)
+                                ];
+                            }
+                            ksort($values);
+                            $result['filterData'][$column->name] = array_values($values);
+                            break;
+
+                        default:
                     }
 
-                    asort($values);
-                    $result['filterData'][$column->name] = $values;
                 }
             }
 
