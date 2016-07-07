@@ -640,7 +640,7 @@
                             $criteria = clone $this->dataProvider->countCriteria;
                             $criteria->distinct = true;
                             $criteria->select = $column->name;
-                            $criteria->limit = 500;
+//                            $criteria->limit = -1;
 //                              $command = App()->db->schema->commandBuilder->createFindCommand($model->tableName(), $criteria);
 //                            $values = $command->queryColumn();
                             foreach($model->findAll($criteria) as $dateModel) {
