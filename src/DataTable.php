@@ -87,10 +87,12 @@
 			$data = [];
 
 			Yii::beginProfile('getData');
-            if (!$this->config['serverSide'] && $this->dataProvider instanceof \CActiveDataProvider) {
-                $paginator = $this->dataProvider->getPagination();
+            if (!$this->config['serverSide']) {
+				$paginator = $this->dataProvider->getPagination();
+				if ($this->dataProvider instanceof \CActiveDataProvider) {
+					$this->dataProvider->criteria->order = '';
+				}
                 $this->dataProvider->setPagination(false);
-                $this->dataProvider->criteria->order = '';
                 $source = $this->dataProvider->getData(true);
                 $this->dataProvider->setPagination($paginator);
             } else {
