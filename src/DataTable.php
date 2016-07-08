@@ -654,7 +654,7 @@
                                     "value" => \Yii::app()->dateFormatter->format("MMMM yyyy", $date)
                                 ];
                             }
-                            ksort($values);
+                            krsort($values);
                             $result['filterData'][$column->name] = array_values($values);
                             break;
 
