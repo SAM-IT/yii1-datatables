@@ -2,14 +2,13 @@
  * Respond to events fired by Befound proprietary framework.
  */
 Befound.ready(function() {
-	var ns = Befound.App.name;
-	$(document).on('select.' + ns, function(event, model, id) {
+	$(document).on('select', function(event, model, id) {
 		var selector = 'table.dataTable[data-basemodel=' + model + '][data-route][data-listen]';
 		$(selector).each(function() {
 			$(this).dataTable().api().ajax.url(Befound.App.createUrl($(this).data('route'), {'id' : id})).load();
 		})
 	});
-	$(document).on('update.' + ns + ' create.' + ns, function(event, model, data) {
+	$(document).on('update create', function(event, model, data) {
 		var selector = 'table.dataTable[data-model=' + model + '][data-route][data-listen]';
 		$(selector).each(function() {
 			// Get id.
@@ -26,7 +25,7 @@ Befound.ready(function() {
 
 	});
 
-	$(document).on('delete.' + ns, function(event, model, data) {
+	$(document).on('delete', function(event, model, data) {
 		var selector = 'table.dataTable[data-model=' + model + '][data-listen]';
 		$(selector).each(function() {
             if (typeof data.id == 'object') {
