@@ -431,20 +431,24 @@
 //            $cs->registerScript($this->getId() . 'scripts', $script);
             
 			
-			if (isset($config["ajax"]))
-			{
-//				$this->config["deferLoading"] = $this->dataProvider->getTotalItemCount();
-//				$this->config["serverSide"] = true;
-			}
 			if (!empty($this->onInit))
 			{
 				$config['initComplete'] = new CJavaScriptExpression("function (settings, json) {\n" . implode("\n", $this->onInit) . "\n}");
 			}
 			$config['ordering'] = $this->enableSorting;
+            if (!empty($this->dataProvider->sort->directions)) {
+                $map = array_flip(array_map(function($cc) { return $cc['name']; }, $this->config['columns']));
+                $config['order'] = [];
+                foreach($this->dataProvider->sort->directions as $column => $direction) {
+                    if (isset($map[$column])) {
+                        $config['order'][] = [$map[$column], $direction === \CSort::SORT_DESC ? "desc" : "asc"];
+                    }
+                }
+            }
             
             Yii::app()->getClientScript()->registerScript($this->getId() . 'data', "$('#" . $this->getId() . "').data('dataTable', $('#" . $this->getId() . " table').dataTable(" . \CJavaScript::encode($config) . "));", \CClientScript::POS_READY);
         }
-//
+
 		public function renderFilter()
 		{
 			if($this->filter!==null)
