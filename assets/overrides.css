@@ -1,5 +1,5 @@
 .dataTables_wrapper {
-	overflow-x: scroll;
+	overflow-x: auto;
 	padding-bottom: 16px;
 	padding-right: 15px;
 }
@@ -15,10 +15,6 @@ table.dataTable thead th.sorting_disabled {
 	cursor: default;
 }
 
-/*.controls .datatable-view:first-child {
-	margin-left: -180px;
-}*/
-
 .filters input {
 	width: 100%;
 }
@@ -29,13 +25,6 @@ table.dataTable .nowrap {
 
 table.dataTable thead tr.filters th {
     padding: 2px;
-}
-
-table.dataTable thead th, table.dataTable thead td {
-	padding: 5px 18px 5px 10px;
-}
-table.dataTable thead th.sorting_disabled, table.dataTable thead td.sorting_disabled {
-	padding: 5px 10px 5px 10px;
 }
 
 .datatable-view {
